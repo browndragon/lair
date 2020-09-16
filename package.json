@@ -1,0 +1,24 @@
+{
+  "name": "root",
+  "private": true,
+  "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-jest": "^26.3.0",
+    "babel-loader": "^8.1.0",
+    "eslint": "^7.9.0",
+    "jest": "^26.4.2",
+    "jest-environment-node": "^26.3.0",
+    "lerna": "^3.22.1",
+    "webpack": "^4.44.1"
+  },
+  "type": "module",
+  "scripts": {
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "test:debug": "node --experimental-vm-modules --inspect-brk node_modules/.bin/jest --runInBand"
+  },
+  "jest": {
+    "cacheDirectory": ".jest-cache",
+    "transform": {},
+    "testEnvironment": "jest-environment-node"
+  }
+}
