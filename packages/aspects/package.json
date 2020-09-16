@@ -1,0 +1,27 @@
+{
+  "name": "@browndragon/aspects",
+  "version": "0.0.2",
+  "description": "Aspects (especially intended for use with phaser.io)",
+  "author": "Brown Dragon <browndragon@googlegroups.com>",
+  "homepage": "https://github.com/browndragon/lair#readme",
+  "license": "MIT",
+  "main": "lib/aspects.mjs",
+  "module": "src/aspects.mjs",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/browndragon/lair.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  },
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/browndragon/lair/issues"
+  },
+  "dependencies": {
+    "@browndragon/collections": "^0.0.2"
+  }
+}
