@@ -1,5 +1,5 @@
 import EmptyIter from './emptyIter';
-import SortedMap from './sortedMap.mjs';
+import SortedMap from './sortedMap';
 
 /**
  * Table exposes a 2-dimensional array (by default sorted!) of Rows and Columns,
@@ -15,15 +15,19 @@ import SortedMap from './sortedMap.mjs';
  */
 export default class Table extends Set {
     constructor(iterable, RowMap=SortedMap, ColMap=SortedMap) {
+        super();
         this[M] = {RowMap, ColMap};
         this[R] = new RowMap();  // r -> c -> [[r, c], v]
         this[C] = new ColMap();  // c -> r -> [[r, c], v]
-        this[Symbol.toStringTag] = 'Table';
         if (iterable) {
-            for (let [r, c, v] of iterable) {
+            for (let [[r, c], v] of iterable) {
                 this.set(r, c, v);
             }
         }
+    }
+
+    get [Symbol.toStringTag]() {
+        return 'Table';
     }
 
     clear() {
@@ -57,7 +61,7 @@ export default class Table extends Set {
     }
 
     entries() {
-        return this.values();
+        return super.values();
     }
     entriesInRow(r, start, end) {
         return iterateEntriesInLine(this[R].get(r), start, end);
@@ -144,11 +148,13 @@ export default class Table extends Set {
     }
 
     set(r, c, v) {
-        let inserting = [[r, c], v]
+        const inserting = [[r, c], v];
         let oldR = insertInto(this[R], r, c, this[M].ColMap, inserting);
         let oldC = insertInto(this[C], c, r, this[M].RowMap, inserting);
         console.assert(oldR === oldC);
-        super.delete(oldR);
+        if (oldR) {
+            super.delete(oldR);
+        }
         super.add(inserting);
         return this;
     }
@@ -217,7 +223,7 @@ function insertInto(outer, first, second, secondCtor, inserting) {
     if (!inner) {
         outer.set(first, inner = new secondCtor());
     }
-    let alreadyHad = inner.get(second);
+    const alreadyHad = inner.get(second);
     inner.set(second, inserting);
     return alreadyHad;
 }
