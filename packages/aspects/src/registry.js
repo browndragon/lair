@@ -1,30 +1,33 @@
+import {Table} from '@browndragon/collections';
+
 export default class Registry {
     constructor() {
-        this.components = new Map();
-        this.systems = new Map();
-    }
-    system(System, ...params) {
-        this.systems.set(System, new System(this, ...params));
-    }
-    component(Component, ...params) {
-        this.components.set(Component, new Component(this, ...params));
-        return this;
+        this.aspects = new Map();
     }
 
-    components(cb, ...Components) {
-        if (Components.length == 0) {
-            this.components.forEach(cb);
-        }
-        for (let C of Components) {
-            cb(this.components.get(C));
-        }
+    register(Aspect, ...params) {
+        this.aspects.set(Aspect, new Aspect(this, ...params));
+        return this;
     }
-    systems(cb, ...Systems) {
-        if (Systems.length == 0) {
-            this.systems.forEach(cb);
+    unregister(Aspect) {
+        this.data.deleteCol(this.aspect(Aspect),
+            (data, [instance, aspect]) => aspect.unbound(data, instance)
+        );
+        this.aspects.delete(Aspect);
+        return this;
+    }
+    aspect(Aspect) {
+        const aspect = this.aspects.get(Aspect);
+        console.assert(aspect);
+        return aspect;
+    }
+    forEach(cb) {
+        this.aspects.forEach(cb);
+    }
+    forget(instance) {
+        for (let aspect of this.aspects.values()) {
+            aspect.unbind(instance);
         }
-        for (let S of Systems) {
-            cb(this.systems.get(S));
-        }
+        return this;
     }
 }
