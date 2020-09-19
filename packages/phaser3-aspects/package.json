@@ -1,12 +1,19 @@
 {
-  "name": "@browndragon/aspects",
+  "name": "@browndragon/phaser3-aspects",
   "version": "0.0.2",
-  "description": "Aspects (especially intended for use with phaser.io)",
+  "description": "Augments @browndragon/aspects with phaser3 plugins & support",
   "author": "Brown Dragon <browndragon@googlegroups.com>",
   "homepage": "https://github.com/browndragon/lair#readme",
   "license": "MIT",
-  "main": "lib/aspects.js",
-  "module": "src/aspects.js",
+  "main": "lib/phaser3-aspects.js",
+  "module": "src/phaser3-aspects.js",
+  "directories": {
+    "lib": "dist",
+    "test": "__tests__"
+  },
+  "files": [
+    "dist"
+  ],
   "publishConfig": {
     "access": "public"
   },
@@ -17,11 +24,16 @@
   "scripts": {
     "test": "echo \"Error: run tests from root\" && exit 1"
   },
-  "type": "module",
   "bugs": {
     "url": "https://github.com/browndragon/lair/issues"
   },
   "dependencies": {
-    "@browndragon/collections": "^0.0.2"
+    "@browndragon/aspects": "^0.0.2"
+  },
+  "peerDependencies": {
+    "phaser": "^3.24.1"
+  },
+  "devDependencies": {
+    "phaser": "^3.24.1"
   }
 }
