@@ -1,5 +1,6 @@
 import EmptyIter from './emptyIter';
 import SortedMap from './sortedMap';
+const DeleteLine = Symbol('DeleteLine');
 
 /**
  * Table exposes a 2-dimensional array (by default sorted!) of Rows and Columns,
@@ -36,42 +37,62 @@ export default class Table extends Set {
         super.clear();
     }
 
-    delete(r, c) {
+    delete(r, c, cb=undefined) {
         let s1 = destructiveDeref(this[R], r, c);
         let s2 = destructiveDeref(this[C], c, r);
         console.assert(s1 === s2);
         if (s1 === undefined) {
             return false;
         }
+        if (cb) { cb.call(undefined, ...[...s1].reverse()); }
         return super.delete(s1);
     }
-    deleteRow(r) {
-        let entries = deleteLine(this[R], r, this[C]);
-        for (let entry of entries) {
-            super.delete(entry);
+
+    [DeleteLine](primary, pkey, secondary, callback=undefined) {
+        let line = primary.get(pkey);
+        if (!line) {
+            return 0;
         }
-        return entries.size;
+        for (let [intercept, cell] of line) {
+            let otherCell = destructiveDeref(secondary, intercept, pkey);
+            console.assert(cell === otherCell);
+        }
+        primary.delete(pkey);
+        for (let cell of line.values()) {
+            if (cb) { cb.call(undefined, ...[...cell].reverse()); }
+            super.delete(cell);
+        }
+        return line.size;
     }
-    deleteCol(c) {
-        let entries = deleteLine(this[C], c, this[R]);
-        for (let entry of entries) {
-            super.delete(entry);
-        }
-        return entries.size;
+
+    deleteRow(r, callback=undefined) {
+        return this[DeleteLine](this[R], r, this[C], callback);
+
+    }
+    deleteCol(c, callback=undefined) {
+        return this[DeleteLine](this[C], c, this[R], callback);
     }
 
     entries() {
         return super.values();
     }
     entriesInRow(r, start, end) {
-        return iterateEntriesInLine(this[R].get(r), start, end);
+        const line = this[R].get(r);
+        if (!line) {
+            return EmptyIter;
+        }
+        return line.values(start, end);
     }
     entriesInCol(c, start, end) {
-        return iterateEntriesInLine(this[C].get(c), start, end);
+        const line = this[C].get(c);
+        if (!line) {
+            return EmptyIter;
+        }
+        return line.values(start, end);
     }
     forEach(callback, thisArg) {
         for (let [k, v] of this.entries()) {
-            callback.call(thisArg, v, k, this);
+            callback.call(thisArg, v, /* [r, c] */ k, this);
         }
     }
     forEachInRow(r, callback, thisArg, start, end) {
@@ -163,19 +184,15 @@ export default class Table extends Set {
             yield v;
         }
     }
-    valuesInRow(r, start, end) {
-        let line = this[R].get(r);
-        if (!line) {
-            return EmptyIter;
+    *valuesInRow(r, start, end) {
+        for (let [_, v] of this.entriesInRow(r, start, end)) {
+            yield v;
         }
-        return line.values(start, end);
     }
-    valuesInCol(c, start, end) {
-        let line = this[C].get(c);
-        if (!line) {
-            return EmptyIter;
+    *valuesInCol(c, start, end) {
+        for (let [_, v] of this.entriesInCol(c, start, end)) {
+            yield v;
         }
-        return line.values(start, end);
     }
 
     [Symbol.iterator]() {
@@ -189,18 +206,6 @@ const M = Symbol('MapClasses');
 const R = Symbol('Rows');
 const C = Symbol('Cols');
 
-function deleteLine(primary, pKey, secondary) {
-    let outer = primary.get(pkey);
-    if (!outer) {
-        return 0;
-    }
-    for (let [skey, odata] of outer) {
-        let idata = destructiveDeref(secondary, skey, pkey);
-        console.assert(odata === idata);
-    }
-    primary.delete(pkey);
-    return outer;
-}
 
 function destructiveDeref(outer, first, second) {
     let inner = outer.get(first);
@@ -226,13 +231,4 @@ function insertInto(outer, first, second, secondCtor, inserting) {
     const alreadyHad = inner.get(second);
     inner.set(second, inserting);
     return alreadyHad;
-}
-
-function* iterateEntriesInLine(line, entries, start, end) {
-    if (!line) {
-        return;
-    }
-    for (let s of line.values(start, end)) {
-        yield entries.get(s);
-    }
 }

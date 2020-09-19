@@ -2,6 +2,9 @@
   "name": "root",
   "private": true,
   "devDependencies": {
+    "@babel/preset-env": "^7.11.5",
+    "babel": "^6.23.0",
+    "babel-cli": "^6.26.0",
     "babel-core": "^6.26.3",
     "babel-jest": "^26.3.0",
     "babel-loader": "^8.1.0",
@@ -13,12 +16,36 @@
   },
   "type": "module",
   "scripts": {
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
-    "test:debug": "node --experimental-vm-modules --inspect-brk node_modules/.bin/jest --runInBand"
+    "build": "lerna exec --parallel -- babel --root-mode upward src -d lib --ignore **/*.spec.js,**/*.test.js",
+    "test": "jest",
+    "test:debug": "node --inspect-brk node_modules/.bin/jest --runInBand"
   },
   "jest": {
     "cacheDirectory": ".jest-cache",
-    "transform": {},
-    "testEnvironment": "jest-environment-node"
+    "moduleFileExtensions": [
+      "js",
+      "jsx",
+      "json",
+      "mjs",
+      "node",
+      "ts",
+      "tsx"
+    ],
+    "moduleDirectories": [
+      "node_modules"
+    ],
+    "moduleNameMapper": {
+      "@browndragon/(.+)$": "<rootDir>packages/$1/src"
+    },
+    "testRegex": "(/tests/.*|(\\.|/)(test|spec))\\.(m?jsx?|tsx?)$",
+    "testPathIgnorePatterns": [
+      "<rootDir>/packages/(?:.+?)/lib/"
+    ],
+    "transform": {
+      "^.+\\.m?jsx?$": "babel-jest"
+    },
+    "transformIgnorePatterns": [
+      "<rootDir>/node_modules/(?!(@browndragon/.*))"
+    ]
   }
 }

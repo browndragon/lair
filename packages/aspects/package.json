@@ -5,8 +5,8 @@
   "author": "Brown Dragon <browndragon@googlegroups.com>",
   "homepage": "https://github.com/browndragon/lair#readme",
   "license": "MIT",
-  "main": "lib/aspects.mjs",
-  "module": "src/aspects.mjs",
+  "main": "lib/aspects.js",
+  "module": "src/aspects.js",
   "publishConfig": {
     "access": "public"
   },
