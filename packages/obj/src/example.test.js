@@ -1,26 +1,3 @@
-# `@browndragon/obj`
-
-Utilities for interacting with es6 objects and maps "transparently".
-
-Provides standard utilities like get/set/delete/entries/keys/forEach which need little introduction.
-
-### `set`, `underwrite`, `overwrite`
-All 3 mutation methods are similar but slightly different. They take 4 parameters:
-* The `object` to mutate (map or js object)
-* The `key` to add or update
-* The `value` to add or update (if `undefined`, see fourth parameter!)
-* `yesIWantToWriteUndefined`: An optional truthy parameter; if false, `undefined` values are never written (the method just returns); if true, values are written even if `undefined`. This avoids spuriously empty keys.
-
-* `set` returns the `value` parameter.
-* `underwrite` only updates keys which are absent (or `undefined`), returning the value the key had had.
-* `overwrite` is like set, but returns the old value of the key.
-
-## Usage
-
-See the unit tests; for example:
-```js
-// src/example.test.js
-
 import { describe, test, expect } from '@jest/globals';
 import obj from '.';  // '@browndragon/obj'; <-- this is a unit test so I can't write that!
 
@@ -45,5 +22,3 @@ test('Example', () => {
     // (just to show the aftereffects. This isn't part of the library.)
     expect(t).toEqual({a:1});
 });
-
-```

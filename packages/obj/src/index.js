@@ -18,6 +18,16 @@ export default {
         return true;
     },
 
+    /** Removes k from o for all k in o. */
+    clear(o) {
+        if (this.isCollection(o)) {
+            o.clear();
+            return;
+        }
+        for (let k of this.keys(o)) {
+            this.delete(o, k);
+        }
+    },
     /** Removes k from o. */
     delete(o, k) {
         if (this.isMap(o)) {

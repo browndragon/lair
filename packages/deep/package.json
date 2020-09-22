@@ -1,0 +1,34 @@
+{
+  "name": "@browndragon/deep",
+  "version": "0.0.2",
+  "description": "Modules for working generically with nested data structures.",
+  "author": "Brown Dragon <browndragon@googlegroups.com>",
+  "homepage": "https://github.com/browndragon/lair#readme",
+  "license": "MIT",
+  "main": "lib/index.js",
+  "module": "src/index.js",
+  "directories": {
+    "lib": "dist",
+    "test": "__tests__"
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/browndragon/lair.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  },
+  "bugs": {
+    "url": "https://github.com/browndragon/lair/issues"
+  },
+  "dependencies": {
+    "@browndragon/func": "^0.0.2",
+    "@browndragon/obj": "^0.0.2"
+  }
+}

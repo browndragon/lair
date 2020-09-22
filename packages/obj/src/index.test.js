@@ -97,6 +97,17 @@ describe('Obj CRUD', () => {
         expect(d).toEqual(s);
     });
     test.each([
+        {},
+        {a:1},
+        {a:1, b:2},
+        {a:{b:1}},
+    ])('clear(%p)', (d) => {
+        d = {...d};
+        Obj.clear(d);
+        expect(d).toEqual({});
+        expect(Obj.isEmptyLiteral(d));
+    });
+    test.each([
         [{}, undefined, undefined, {}],
         [{}, 'a', undefined, {}],
         [{}, 'a', undefined, {}],
