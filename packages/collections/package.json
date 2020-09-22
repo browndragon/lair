@@ -5,8 +5,8 @@
   "author": "Brown Dragon <browndragon@googlegroups.com>",
   "homepage": "https://github.com/browndragon/lair#readme",
   "license": "MIT",
-  "main": "lib/collections.js",
-  "module": "src/collections.js",
+  "main": "lib/index.js",
+  "module": "src/index.js",
   "publishConfig": {
     "access": "public"
   },
