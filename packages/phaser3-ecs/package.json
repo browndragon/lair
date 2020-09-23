@@ -1,0 +1,37 @@
+{
+  "name": "@browndragon/phaser3-ecs",
+  "version": "0.0.2",
+  "description": "An entity component system plugin using phaser3 for the entities and components.",
+  "keywords": [
+    "phaser3",
+    "ECS"
+  ],
+  "author": "Brown Dragon <browndragon@googlegroups.com>",
+  "homepage": "https://github.com/browndragon/lair#readme",
+  "license": "MIT",
+  "main": "lib/index.js",
+  "module": "src/index.js",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/browndragon/lair.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  },
+  "bugs": {
+    "url": "https://github.com/browndragon/lair/issues"
+  },
+  "dependencies": {
+    "is-empty-object": "^1.1.1",
+    "@browndragon/ecs": "^0.0.2"
+  },
+  "devDependencies": {
+    "phaser": "^3.24.1"
+  },
+  "peerDependencies": {
+    "phaser": "^3.24.1"
+  }
+}

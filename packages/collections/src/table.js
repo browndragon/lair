@@ -1,5 +1,4 @@
 import EmptyIter from './emptyIter';
-import SortedMap from './sortedMap';
 const DeleteLine = Symbol('DeleteLine');
 
 /**
@@ -15,7 +14,7 @@ const DeleteLine = Symbol('DeleteLine');
  * accept trailing `start` & `end` parameters which are forwarded to the SortedMap.
  */
 export default class Table extends Set {
-    constructor(iterable, RowMap=SortedMap, ColMap=SortedMap) {
+    constructor(iterable, RowMap=Map, ColMap=Map) {
         super();
         this[M] = {RowMap, ColMap};
         this[R] = new RowMap();  // r -> c -> [[r, c], v]

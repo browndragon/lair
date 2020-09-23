@@ -1,0 +1,23 @@
+{
+  "name": "@browndragon/ecs",
+  "version": "0.0.2",
+  "description": "An entity-component-system (intended for phaser but this contains no game logic)",
+  "author": "Brown Dragon <browndragon@googlegroups.com>",
+  "homepage": "https://github.com/browndragon/lair#readme",
+  "license": "MIT",
+  "main": "lib/index.js",
+  "module": "src/index.js",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/browndragon/lair.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  },
+  "bugs": {
+    "url": "https://github.com/browndragon/lair/issues"
+  }
+}
