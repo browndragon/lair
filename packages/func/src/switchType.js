@@ -15,7 +15,7 @@ export default function switchType(obj, cbs, ...params) {
         }
         case 'string': {
             // This is an *iterable value type*.
-            for (cb of [cbs.string, cbs.iterable, cbs.value]) {
+            for (cb of [cbs.string, cbs.value, cbs.iterable]) {
                 if (cb) {
                     return cb.call(cbs, obj, ...params);
                 }
@@ -62,6 +62,9 @@ export default function switchType(obj, cbs, ...params) {
                     if (cbs.map) {
                         return cbs.map(obj, ...params);
                     }
+                    if (cbs.associative) {
+                        return cbs.associative(obj, ...params);
+                    }
                 }
                 if (obj instanceof Set) {
                     if (cbs.set) {
@@ -91,6 +94,9 @@ export default function switchType(obj, cbs, ...params) {
                     }
                     if (cbs.literal) {
                         return cbs.literal(obj, ...params);
+                    }
+                    if (cbs.associative) {
+                        return cbs.associative(obj, ...params);
                     }
                 }
                 if (cbs.object) {

@@ -1,19 +1,12 @@
 {
-  "name": "@browndragon/deep",
+  "name": "@browndragon/project",
   "version": "0.0.2",
-  "description": "Modules for working generically with nested data structures.",
+  "description": "Projects (math sense) javascript objects down through a template.",
   "author": "Brown Dragon <browndragon@googlegroups.com>",
   "homepage": "https://github.com/browndragon/lair#readme",
   "license": "MIT",
   "main": "lib/index.js",
   "module": "src/index.js",
-  "directories": {
-    "lib": "dist",
-    "test": "__tests__"
-  },
-  "files": [
-    "dist"
-  ],
   "publishConfig": {
     "access": "public"
   },

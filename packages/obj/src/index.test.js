@@ -190,3 +190,39 @@ describe('Map CRUD', () => {
         expect([...d]).toEqual(s);
     });
 });
+
+describe('Deep Objects', () => {
+    test.each([
+        ['', undefined],
+        ['a', 'a'],
+        ['ab', {a:'b'}],
+        ['abc', {a:{b:'c'}}],
+    ])('wrap(%p)==%p', (i, o) => {
+        expect(Obj.wrap(...[...i])).toEqual(o);
+    });
+    test.each([
+        // Note these examples are misleading; the middle string is treated as an
+        // array of single characters which are then in-place expanded with ellipses.
+        [undefined, '', undefined ],
+        [undefined, 'a', undefined ],
+        [undefined, 'ab', undefined ],
+        ['a', '', [] ],
+        ['a', 'a', [] ],
+        ['a', 'ab', [] ],
+        [{}, '', [] ],
+        [{}, 'a', [] ],
+        [{}, 'ab', [] ],
+        [{b:1}, '', [] ],
+        [{b:1}, 'a', [] ],
+        [{b:1}, 'ab', [] ],
+        [{a:1}, '', [] ],
+        [{a:1}, 'a', [1] ],
+        [{a:1}, 'ab', [1] ],
+        [{a:{b:1}}, '', [] ],
+        [{a:{b:1}}, 'a', [{b:1}] ],
+        [{a:{b:1}}, 'ab', [{b:1}, 1] ],
+        [{a:{b:1}}, 'ac', [{b:1}] ],
+    ])('deepGet(%p, %p)==%p', (t, i, o) => {
+        expect(Obj.deepGet(t, ...[...i])).toEqual(o);
+    });
+});

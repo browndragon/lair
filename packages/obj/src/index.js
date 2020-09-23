@@ -17,6 +17,12 @@ export default {
         }
         return true;
     },
+    isObject(o) {
+        if (o == undefined) {  // || null.
+            return false;
+        }
+        return o instanceof Object;
+    },
 
     /** Removes k from o for all k in o. */
     clear(o) {
@@ -39,8 +45,21 @@ export default {
         delete o[k];
         return v;
     },
+    /** As `map.has(k)`, or `k in o`. */
+    has(o, k) {
+        if (this.isMap(o)) {
+            return o.has(k);
+        }
+        if (this.isObject(o)) {
+            return k in o;
+        }
+        return false;
+    },
     /** Gets k's value. */
     get(o, k) {
+        if (o == undefined) {
+            return undefined;
+        }
         if (this.isMap(o)) {
             return o.get(k);
         }
@@ -77,24 +96,52 @@ export default {
         if (this.isCollection(o)) {
             return o.entries();
         }
-        return Object.entries(o);
+        if (this.isObject(o)) {
+            return Object.entries(o);
+        }
+        return [];
     },
     keys(o) {
         if (this.isCollection(o)) {
-            if ('keys' in o){
-                return o.keys();
-            }
-            let keys = [];
-            for (let [k] of this.entries(o)) {
-                keys.push(k);
-            }
-            return keys;
+            // Handle maps etc.
+            if ('keys' in o) { return o.keys(); }
+            // Handle sets (, tables, etc).
+            return Array.from(o.entries(), ([v, k]) => k);
         }
-        return Object.keys(o);
+        if (this.isObject(o)) {
+            return Object.keys(o);
+        }
+        return [];
     },
     forEach(o, cb, thisArg) {
+        if (o == undefined) {
+            return;
+        }
         for (let [k, v] of this.entries(o)) {
             cb.call(thisArg, v, k, o);
         }
+    },
+    /** Returns [o[ks[0]], o[ks[0]][ks[1]], ... o[ks[0]][...][ks[n]]]. */
+    deepGet(o, ...ks) {
+        if (o == undefined) {
+            return undefined;
+        }
+        let ret = [];
+        for (let k of ks) {
+            o = o[k];
+            if (o == undefined) {
+                return ret;
+            }
+            ret.push(o);
+        }
+        return ret;
+    },
+    /** Returns an object {k0:{k1:{...kn-1:kn}}} */
+    wrap(...ks) {
+        let v = ks.pop();
+        for (let k of ks.reverse()) {
+            v = {[k]:v};
+        }
+        return v;
     },
 };
