@@ -17,22 +17,30 @@ Systems are standalone;
 import {Registry, System} from '@browndragon/ecs';
 class Greeter extends System {
     test(x) {return typeof(x) == 'string'}
-    update(context, added, updated, removed, unchanged) {
-        for (let x of added) {
+    update(context) {
+        for (let x of context.added) {
             console.log(`Hello ${x}!`);
         }
     }
 }
-class Greeter extends System {
-    test(x) {return typeof(x) == 'string'}
-    update(context, added, updated, removed, unchanged) {
+class Replacer extends System {
+    test(x) {return typeof(x) == 'string' && !x.startsWith('replaced')}
+    update(context) {
         for (let x of added) {
-            console.log(`Hello ${x}!`);
+            // Strings aren't mutable. If these were objects, we could modify the object then re-observe it; much sexier.
+            context.registry.remove(x);
+            context.registry.observe(`replaced${x}`)
         }
     }
 }
 let registry = new Registry();
-registry.addSystem(new MySystem());
-registry.observe(7);  // Nope!
-registry.observe()
+registry.addSystem(Greeter).addSystem(Replacer);
+registry.observe(7);
+registry.update();  // Nope! Nothing happens
+registry.observe('apple');
+registry.update();  // Expect:
+// console.log('Hello, apple!')
+registry.update();  // Expect:
+// console.log('Hello, replacedapple!')
+registry.update();  // Nothing else happens.
 ```

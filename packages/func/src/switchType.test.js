@@ -66,7 +66,7 @@ describe('SwitchType', () => {
         {h:{string(obj) {return 2 + obj.length}}, e:5},
         {h:{value(obj) {return 3+obj.length}}, e:6},
         {h:{string(obj) {return 4+obj.length}, value(obj) { return 5+obj.length}}, e:7},
-        {h:{iterable(obj) {return 5+obj.length}, value(obj) { return 6+obj.length}}, e:8},
+        {h:{value(obj) { return 5+obj.length}, iterable(obj) {return 6+obj.length}}, e:8},
     ])('str %#', ({h, e}) => {
         expect(switchType('str', h)).toBe(e);
     });

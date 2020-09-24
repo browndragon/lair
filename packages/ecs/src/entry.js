@@ -1,16 +1,43 @@
-export default class Entry {
+import {Context} from './system';
+
+const States = {
+    added: Symbol('added'),
+    updated: Symbol('updated'),
+    premoved: Symbol('premoved'),
+    removed: Symbol('removed'),
+    unchanged: Symbol('unchanged'),
+    // & `undefined: undefined,`
+};
+export default class Entry extends Context {
     constructor(system) {
-        this.system = system;
+        super();
         for (let state of Object.values(States)) {
             this[state] = new Set();
         }
-        this.dirties = [];
+        this.dirtyObserves = [];
+        this.dirtyRemovals = [];
         this.isUpdating = false;
+        this.system = system
     }
 
+    /** System.Context methods. */
+    get added() {
+        console.assert(this.isUpdating);
+        return this[States.added];
+    }
+    get updated() {
+        console.assert(this.isUpdating);
+        return this[States.updated];
+    }
+    get removed() {
+        console.assert(this.isUpdating);
+        return this[States.removed];
+    }
+
+    /** Registry methods. */
     observe(entity) {
         if (this.isUpdating) {
-            this.dirties.push(entity);
+            this.dirtyObserves.push(entity);
             return;
         }
         let has = this.getEntityState(entity);
@@ -21,10 +48,7 @@ export default class Entry {
         // This is clearly a little crazy; change tracking belongs in this system.
         const wants = this.system.test(entity);
         if (wants == undefined) {  // || null.
-            switch (has) {
-                case States.added: return this.updateState(entity, has, States.premoved);
-                default: return this.updateState(entity, has, States.removed);
-            }
+            return this.remove(entity);
         }
         if (wants) {
             switch (has) {
@@ -42,6 +66,55 @@ export default class Entry {
         // Otherwise, we don't have enough information to make a change.
         // So don't change anything!
     }
+    remove(entity, hard, now) {
+        if (!now && this.isUpdating) {
+            this.dirtyRemovals.push(entity);
+            return;
+        }
+        let has = this.getEntityState(entity);
+        if (hard) {
+            return this.updateState(entity, has, undefined);
+        }
+        switch (has) {
+            case undefined: return undefined;
+            case States.added: return this.updateState(entity, has, States.premoved);
+            default: return this.updateState(entity, has, States.removed);
+        }            
+    }
+    /** Performs the update tick. */
+    // Update vs updated. A bug waiting to happen?
+    update(...params) {
+        this.isUpdating = true;
+        this.system.update(this, ...params);
+        // Removed entries get cleared.
+        for (let state of [States.premoved, States.removed]) {
+            this[state].clear();
+        }
+        // Updated entries were handled, so clean them.
+        for (let state of [States.added, States.updated]) {
+            for (let entity of this[state]) {
+                this.updateState(entity, state, States.unchanged);
+            }
+        }
+        // Handle anything that was touched while we were updating.
+        let dirtyObserves = this.dirtyObserves;
+        let dirtyRemovals = this.dirtyRemovals;
+        if (dirtyObserves.length > 0) {
+            this.dirtyObserves = [];
+        }
+        if (dirtyRemovals.length > 0) {
+            this.dirtyRemovals = [];
+        }
+        this.isUpdating = false;
+        for (let entity of dirtyObserves) {
+            this.observe(entity);
+        }
+        for (let entity of dirtyRemovals) {
+            this.remove(entity);
+        }
+    }
+
+    /** Internal state management methods. */
     getEntityState(entity) {
         for (let state of Object.values(States)) {
             if (this[state].has(entity)) {
@@ -61,41 +134,4 @@ export default class Entry {
             this[upcomingState].add(entity);
         }
     }
-    update(context) {
-        this.isUpdating = true;
-        this.system.update(
-            context,
-            this[States.added].values(),
-            this[States.updated].values(),
-            this[States.removed].values(),
-            // Premoved were removed before calling added, so don't even pass to system.
-        );
-        // Removed entries get cleared.
-        for (let state of [States.premoved, States.removed]) {
-            this[state].clear();
-        }
-        // Updated entries were handled, so clean them.
-        for (let state of [States.added, States.updated]) {
-            for (let entity of this[state]) {
-                this.updateState(entity, state, States.unchanged);
-            }
-        }
-        // Handle anything that was touched while we were updating.
-        let dirties = this.dirties;
-        if (dirties.length > 0) {
-            this.dirties = [];
-        }
-        this.isUpdating = false;
-        for (let entity of dirties) {
-            this.observe(entity);
-        }
-    }
 }
-
-const States = {
-    added: Symbol('added'),
-    updated: Symbol('updated'),
-    premoved: Symbol('premoved'),
-    removed: Symbol('removed'),
-    unchanged: Symbol('unchanged'),
-};

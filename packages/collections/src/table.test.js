@@ -1,5 +1,6 @@
 import { describe, test, expect } from '@jest/globals';
 import Table from './table';
+import SortedMap from './sortedMap';
 
 describe.each([
     ['empty', {
@@ -40,7 +41,7 @@ describe.each([
         entries: [[['a', 'b'], 1]],
     }],
 ])('Table %s', (nick, {init, rows, cols, entries=init}) => {
-    const t = new Table(init);
+    const t = new Table(init, SortedMap, SortedMap);
     test('size', () => expect(t.size).toEqual(entries.length));
     test('rowKeys', () => expect(Array.from(t.rowKeys())).toEqual(rows));
     test('colKeys', () => expect(Array.from(t.colKeys())).toEqual(cols));
