@@ -30,4 +30,3 @@ coverage/
 .nyc_output/
 .eslintcache
 .jest-cache/
-package-lock.json

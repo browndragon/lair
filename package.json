@@ -16,6 +16,7 @@
     "jest": "^26.4.2",
     "jest-environment-node": "^26.3.0",
     "lerna": "^3.22.1",
+    "phaser": "^3.24.1",
     "raw-loader": "^3.1.0",
     "terser-webpack-plugin": "^2.2.1",
     "webpack": "^4.41.2",
@@ -60,5 +61,16 @@
     "transformIgnorePatterns": [
       "<rootDir>/node_modules/(?!(@browndragon/.*))"
     ]
+  },
+  "dependencies": {
+    "@browndragon/aspects": "file:packages/aspects",
+    "@browndragon/collections": "file:packages/collections",
+    "@browndragon/collections2": "file:packages/collections2",
+    "@browndragon/ecs": "file:packages/ecs",
+    "@browndragon/func": "file:packages/func",
+    "@browndragon/obj": "file:packages/obj",
+    "@browndragon/phaser3-ecs": "file:packages/phaser3-ecs",
+    "@browndragon/phaser3-ecs-examples": "file:packages/phaser3-ecs-examples",
+    "@browndragon/project": "file:packages/project"
   }
 }

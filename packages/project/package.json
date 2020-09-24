@@ -1,6 +1,6 @@
 {
   "name": "@browndragon/project",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Projects (math sense) javascript objects down through a template.",
   "author": "Brown Dragon <browndragon@googlegroups.com>",
   "homepage": "https://github.com/browndragon/lair#readme",
@@ -21,7 +21,7 @@
     "url": "https://github.com/browndragon/lair/issues"
   },
   "dependencies": {
-    "@browndragon/func": "^0.0.3",
-    "@browndragon/obj": "^0.0.3"
+    "@browndragon/func": "file:../func",
+    "@browndragon/obj": "file:../obj"
   }
 }

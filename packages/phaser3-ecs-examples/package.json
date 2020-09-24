@@ -1,6 +1,6 @@
 {
   "name": "@browndragon/phaser3-ecs-examples",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "private": true,
   "description": "Repo of examples for @browndragon/phaser3-ecs",
   "author": "Brown Dragon <browndragon@googlegroups.com>",
@@ -22,7 +22,7 @@
     "url": "https://github.com/browndragon/lair/issues"
   },
   "dependencies": {
-    "@browndragon/phaser3-ecs": "^0.0.3",
+    "@browndragon/phaser3-ecs": "file:../phaser3-ecs",
     "phaser": "^3.24.1"
   }
 }
