@@ -1,6 +1,6 @@
 {
   "name": "@browndragon/obj",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Methods to treat es6 collections & objects transparently equivalently.",
   "author": "Brown Dragon <browndragon@googlegroups.com>",
   "homepage": "https://github.com/browndragon/lair#readme",
