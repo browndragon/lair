@@ -1,11 +1,13 @@
 {
   "name": "@browndragon/ecs",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "An entity-component-system (intended for phaser but this contains no game logic)",
   "author": "Brown Dragon <browndragon@googlegroups.com>",
   "homepage": "https://github.com/browndragon/lair#readme",
   "license": "MIT",
-  "files": ["lib"],
+  "files": [
+    "lib"
+  ],
   "main": "lib/index.js",
   "module": "src/index.js",
   "publishConfig": {

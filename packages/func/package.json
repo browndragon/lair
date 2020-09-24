@@ -1,20 +1,19 @@
 {
   "name": "@browndragon/func",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "es6 functional programming tools",
   "author": "Brown Dragon <browndragon@googlegroups.com>",
   "homepage": "https://github.com/browndragon/lair#readme",
   "license": "MIT",
-  "files": ["lib"],
+  "files": [
+    "dist"
+  ],
   "main": "lib/index.js",
   "module": "src/index.js",
   "directories": {
     "lib": "dist",
     "test": "__tests__"
   },
-  "files": [
-    "dist"
-  ],
   "publishConfig": {
     "access": "public"
   },
