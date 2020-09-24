@@ -7,9 +7,12 @@ export default class Scene extends Phaser.Scene {
         super(...params);
         this[R] = new Registry();
     }
-    addSystem(System) {
-        this[R].addSystem(System, this);
+    runSystem(System) {
+        this[R].add(System, this);
         return this;
+    }
+    entity(gameObject) {
+        this[R].observe(gameObject);
     }
 
     preload() {
