@@ -24,7 +24,7 @@ export default class NMap extends Map {
     normalize(ks, inserting, deleting) {
         let d = this[D];
         let maps = [this[D]];
-        for (int i = 0; i < this[M].length - 1; ++i) {
+        for (let i = 0; i < this[M].length - 1; ++i) {
             const k = ks[i];  // Backfill undefined.
             let e = d.get(k);
             if (!e) {
