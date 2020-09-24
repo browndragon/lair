@@ -9,7 +9,7 @@ const States = {
     // & `undefined: undefined,`
 };
 export default class Entry extends Context {
-    constructor(system) {
+    constructor(registry) {
         super();
         for (let state of Object.values(States)) {
             this[state] = new Set();
@@ -17,7 +17,9 @@ export default class Entry extends Context {
         this.dirtyObserves = [];
         this.dirtyRemovals = [];
         this.isUpdating = false;
-        this.system = system
+        this.registry = registry;
+        // Set by the registry.
+        this.system = null;
     }
 
     /** System.Context methods. */
@@ -33,9 +35,15 @@ export default class Entry extends Context {
         console.assert(this.isUpdating);
         return this[States.removed];
     }
+    observe(entity) {
+        this.registry.observe(entity);
+    }
+    remove(entity) {
+        this.registry.remove(entity);
+    }
 
     /** Registry methods. */
-    observe(entity) {
+    doObservation(entity) {
         if (this.isUpdating) {
             this.dirtyObserves.push(entity);
             return;
@@ -48,7 +56,7 @@ export default class Entry extends Context {
         // This is clearly a little crazy; change tracking belongs in this system.
         const wants = this.system.test(entity);
         if (wants == undefined) {  // || null.
-            return this.remove(entity);
+            return this.doRemoval(entity);
         }
         if (wants) {
             switch (has) {
@@ -66,7 +74,7 @@ export default class Entry extends Context {
         // Otherwise, we don't have enough information to make a change.
         // So don't change anything!
     }
-    remove(entity, hard, now) {
+    doRemoval(entity, hard, now) {
         if (!now && this.isUpdating) {
             this.dirtyRemovals.push(entity);
             return;
@@ -83,7 +91,7 @@ export default class Entry extends Context {
     }
     /** Performs the update tick. */
     // Update vs updated. A bug waiting to happen?
-    update(...params) {
+    doUpdate(...params) {
         this.isUpdating = true;
         this.system.update(this, ...params);
         // Removed entries get cleared.

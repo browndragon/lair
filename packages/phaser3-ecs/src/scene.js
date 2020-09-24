@@ -11,8 +11,11 @@ export default class Scene extends Phaser.Scene {
         this[R].add(System, this);
         return this;
     }
-    entity(gameObject) {
+    addEntity(gameObject) {
         this[R].observe(gameObject);
+    }
+    removeEntity(gameObject, hard, now) {
+        this[R].remove(gameObject, hard, now);
     }
 
     preload() {

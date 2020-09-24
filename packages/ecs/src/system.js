@@ -1,6 +1,6 @@
 export default class System {
-    constructor(registry) {
-        this.registry = registry;
+    constructor(context) {
+        this.context = context;
     }
     /** 
      * You should return:
@@ -13,7 +13,7 @@ export default class System {
     test(entity) {}
 
     /** Called in response to registry update with an instance of `Context` below. */
-    update(context, ...params) {}
+    update(...params) {}
 }
 
 /** Interface class for use during `update` method. */
@@ -24,4 +24,9 @@ export class Context {
     get updated() { throw 'unimplemented' }
     /** Gets all entities this system newly `test`ed positive for this update. */
     get removed() { throw 'unimplemented' }
+
+    /** Causes this entity to be reobserved by all systems. */
+    observe(entity) { throw 'unimplemented' }
+    /** Causes this entity to be removed from all systems. */
+    remove(entity) { throw 'unimplemented' }
 }

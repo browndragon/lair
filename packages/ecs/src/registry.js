@@ -9,8 +9,9 @@ export default class Registry {
      * Registers a system for calls to observe, remove, etc.
      */
     add(SystemClass, ...params) {
+        let entry = new Entry(this);
         let system = new SystemClass(this, ...params);
-        let entry = new Entry(system);
+        entry.system = system;
         this[S].add(entry);
         return this;
     }
@@ -21,7 +22,7 @@ export default class Registry {
      */
     observe(entity) {
         for (let entry of this[S].values()) {
-            entry.observe(entity);
+            entry.doObservation(entity);
         }
         return this;
     }
@@ -33,14 +34,14 @@ export default class Registry {
      */
     remove(entity, hard=undefined, now=undefined) {
         for (let entry of this[S].values()) {
-            entry.remove(entity, hard, now);
+            entry.doRemoval(entity, hard, now);
         }
         return this;
     }
 
     update(...params) {
         for (let entry of this[S].values()) {
-            entry.update(...params);
+            entry.doUpdate(...params);
         }
     }
 

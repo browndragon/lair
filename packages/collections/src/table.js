@@ -14,11 +14,19 @@ const DeleteLine = Symbol('DeleteLine');
  * accept trailing `start` & `end` parameters which are forwarded to the SortedMap.
  */
 export default class Table extends Set {
-    constructor(iterable, RowMap=Map, ColMap=Map) {
+    constructor(iterable, RowMap=undefined, ColMap=undefined) {
         super();
+
+        if (iterable instanceof Table) {
+            if (!RowMap) { RowMap = iterable[M].RowMap }
+            if (!ColMap) { ColMap = iterable[M].ColMap }
+        }
+        if (!RowMap) { RowMap = Map }
+        if (!ColMap) { ColMap = Map }
         this[M] = {RowMap, ColMap};
-        this[R] = new RowMap();  // r -> c -> [[r, c], v]
-        this[C] = new ColMap();  // c -> r -> [[r, c], v]
+
+        this[R] = new this[M].RowMap();  // r -> c -> [[r, c], v]
+        this[C] = new this[M].ColMap();  // c -> r -> [[r, c], v]
         if (iterable) {
             for (let [[r, c], v] of iterable) {
                 this.set(r, c, v);
