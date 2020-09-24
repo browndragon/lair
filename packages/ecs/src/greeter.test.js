@@ -10,30 +10,30 @@ test('Greeter', () => {
     };
     class Greeter extends System {
         test(x) {return typeof(x) == 'string'}
-        update(context) {
-            for (let x of context.removed) {
+        update() {
+            for (let x of this.context.removed) {
                 console.log(`Goodbye, ${x}!`)
             }
-            for (let x of context.added) {
+            for (let x of this.context.added) {
                 console.log(`Hello, ${x}!`);
             }
         }
     }
     class Replacer extends System {
         test(x) {return typeof(x) == 'string' && !x.startsWith('replaced')}
-        update(context) {
-            for (let x of context.added) {
+        update() {
+            for (let x of this.context.added) {
                 // Strings aren't mutable. If these were objects, we could modify the object then re-observe it; exercise to the reader! Instead, we'll forcibly remove it and then add it back.
-                this.registry.remove(x);
-                this.registry.observe(`replaced${x}`);
+                this.context.remove(x);
+                this.context.observe(`replaced${x}`);
             }
         }
     }
     class Updated extends System {
         test(x) { return typeof(x) == 'string' }
-        update(context) {
-            if (context.updated.size > 0) {
-                console.log(`Still here, ${[...context.updated]}?`);
+        update() {
+            if (this.context.updated.size > 0) {
+                console.log(`Still here, ${[...this.context.updated]}?`);
             }
         }
     }

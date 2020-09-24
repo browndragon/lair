@@ -6,6 +6,7 @@
   "author": "Brown Dragon <browndragon@googlegroups.com>",
   "homepage": "https://github.com/browndragon/lair#readme",
   "license": "MIT",
+  "files": ["lib"],
   "main": "lib/index.js",
   "module": "src/index.js",
   "publishConfig": {
