@@ -6,7 +6,8 @@
   "homepage": "https://github.com/browndragon/lair#readme",
   "license": "MIT",
   "files": [
-    "lib"
+    "lib/*",
+    "!/**/*.test.js"
   ],
   "main": "lib/index.js",
   "module": "src/index.js",
