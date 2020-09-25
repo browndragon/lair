@@ -1,7 +1,11 @@
 {
-  "name": "@browndragon/func",
+  "name": "@browndragon/switch-type",
   "version": "0.0.7-alpha.0",
-  "description": "es6 functional programming tools",
+  "description": "An improved `typeof` handler.",
+  "keywords": [
+    "typeof",
+    "es6"
+  ],
   "author": "Brown Dragon <browndragon@googlegroups.com>",
   "homepage": "https://github.com/browndragon/lair#readme",
   "license": "MIT",
@@ -11,10 +15,6 @@
   ],
   "main": "lib/index.js",
   "module": "src/index.js",
-  "directories": {
-    "lib": "dist",
-    "test": "__tests__"
-  },
   "publishConfig": {
     "access": "public"
   },
@@ -29,7 +29,6 @@
     "url": "https://github.com/browndragon/lair/issues"
   },
   "dependencies": {
-    "@browndragon/callable": "file:../callable",
-    "@browndragon/destructure": "file:../destructure"
+    "@browndragon/callable": "file:../callable"
   }
 }

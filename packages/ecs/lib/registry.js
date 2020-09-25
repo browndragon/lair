@@ -10,7 +10,7 @@ export default class Registry {
      */
     add(SystemClass, ...params) {
         let entry = new Entry(this);
-        let system = new SystemClass(this, ...params);
+        let system = new SystemClass(entry, ...params);
         entry.system = system;
         this[S].add(entry);
         return this;

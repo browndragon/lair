@@ -1,5 +1,5 @@
 import { describe, test, e } from '@jest/globals';
-import switchType from './switchType';
+import switchType from './switch-type';
 
 describe('SwitchType', () => {
     test.each([
@@ -74,9 +74,9 @@ describe('SwitchType', () => {
     test.each([
         {h:{}, e:undefined},
         {h:{undefined(obj) {return 7}}, e:undefined},
-        {h:{empty(obj) {return 1}}, e:1},
+        {h:{associative(obj) {return 1}}, e:1},
         {h:{literal(obj) {return 2}}, e:2},
-        {h:{empty(obj) {return 3}, literal(obj) {return 4}}, e:3},
+        {h:{literal(obj) {return 3}, associative(obj) {return 4}}, e:3},
     ])('{} %#', ({h, e}) => {
         expect(switchType({}, h)).toBe(e);
     });
@@ -84,9 +84,9 @@ describe('SwitchType', () => {
     test.each([
         {h:{}, e:undefined},
         {h:{undefined(obj) {return 7}}, e:undefined},
-        {h:{empty(obj) {return 1}}, e:undefined},
+        {h:{associative(obj) {return 1}}, e:1},
         {h:{literal(obj) {return 2}}, e:2},
-        {h:{empty(obj) {return 3}, literal(obj) {return 4}}, e:4},
+        {h:{literal(obj) {return 3}, associative(obj) {return 4}}, e:3},
         {h:{literal(obj) {return 5}, object(obj) {return 6}}, e:5},
         {h:{object(obj) {return 7}}, e:7},
     ])('{a:1} %#', ({h, e}) => {
@@ -95,8 +95,9 @@ describe('SwitchType', () => {
 
     test.each([
         {h:{}, e:undefined},
-        {h:{empty(obj) {return 1}}, e:undefined},
+        {h:{literal(obj) {return 1}}, e:undefined},
         {h:{map(obj) {return 2}}, e:2},
+        {h:{associative(obj) {return 2}}, e:2},
         {h:{iterable(obj) {return 3}}, e:3},
         {h:{map(obj) {return 4}, iterable(obj) {return 5}}, e:4},
         {h:{map(obj) {return 5}, object(obj) {return 6}}, e:5},
@@ -107,7 +108,7 @@ describe('SwitchType', () => {
 
     test.each([
         {h:{}, e:undefined},
-        {h:{empty(obj) {return 1}}, e:undefined},
+        {h:{literal(obj) {return 1}}, e:undefined},
         {h:{array(obj) {return 2}}, e:2},
         {h:{iterable(obj) {return 3}}, e:3},
         {h:{array(obj) {return 4}, iterable(obj) {return 5}}, e:4},

@@ -27,9 +27,10 @@
   "type": "module",
   "scripts": {
     "build:embedme": "lerna exec embedme README.md",
-    "build:webpack": "lerna exec --parallel -- webpack --config ../../webpack/prod.js",
     "build:babel": "lerna exec --parallel -- babel --root-mode upward src -d lib --ignore **/*.spec.js,**/*.test.js",
-    "build": "npm run build:embedme && npm run build:babel && npm run build:webpack",
+    "build": "npm run build:embedme && npm run build:babel",
+    "webpack:phaser3-ecs-examples": "lerna exec --scope phaser3-ecs-examples -- webpack --config ../../webpack/prod.cjs",
+    "webpack": "npm run webpack:phaser3-ecs-examples",
     "test": "jest",
     "test:debug": "node --inspect-brk node_modules/.bin/jest --runInBand",
     "start:phaser3-ecs-examples": "cd ./packages/phaser3-ecs-examples && webpack-dev-server --config ../../webpack/base.cjs --open"

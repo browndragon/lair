@@ -1,5 +1,5 @@
 import { describe, test, expect } from '@jest/globals';
-import project from '.';
+import project from './project';
 
 test.each([
     [undefined, undefined, undefined],

@@ -1,5 +1,5 @@
 import { describe, test, expect } from '@jest/globals';
-import project from '.';  // import project from '@browndragon/project';  <-- unit test, so I can't write that, but you can!
+import project from './project';  // import project from '@browndragon/project';  <-- unit test, so I can't write that, but you can!
 
 test('Example', () => {
     // A non-literal query returns the input if they're equivalent by `==`, or else undefined.

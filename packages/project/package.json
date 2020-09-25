@@ -25,7 +25,7 @@
     "url": "https://github.com/browndragon/lair/issues"
   },
   "dependencies": {
-    "@browndragon/func": "file:../func",
+    "@browndragon/callable": "file:../callable",
     "@browndragon/obj": "file:../obj"
   }
 }
