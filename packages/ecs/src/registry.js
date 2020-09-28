@@ -50,7 +50,7 @@ export default class Registry {
     }
 
     forEachSystem(cb) {
-        for (let entry of this.systems.values()) {
+        for (let entry of this.values()) {
             cb(entry.system);
         }
     }
