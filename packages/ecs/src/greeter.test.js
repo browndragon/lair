@@ -38,7 +38,7 @@ test('Greeter', () => {
         }
     }
     let registry = new Registry();
-    registry.add(Greeter).add(Replacer).add(Updated);
+    registry.register(Greeter).register(Replacer).register(Updated);
 
     registry.observe(7);
     registry.update();

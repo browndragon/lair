@@ -1,16 +1,17 @@
 {
-  "name": "@browndragon/ecs",
+  "name": "@browndragon/pubsub",
+  "private": true,
   "version": "0.0.7",
-  "description": "An entity-component-system (intended for phaser but this contains no game logic)",
+  "description": "Quick pubsub shim/toy for @browndragon/ecs",
   "author": "Brown Dragon <browndragon@googlegroups.com>",
   "homepage": "https://github.com/browndragon/lair#readme",
   "license": "MIT",
+  "main": "lib/index.js",
+  "module": "src/index.js",
   "files": [
     "lib/*",
     "!/**/*.test.js"
   ],
-  "main": "lib/index.js",
-  "module": "src/index.js",
   "publishConfig": {
     "access": "public"
   },

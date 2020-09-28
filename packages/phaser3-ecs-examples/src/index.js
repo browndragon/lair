@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import System from '@browndragon/phaser3-ecs'
+import System, {Scene} from '@browndragon/phaser3-ecs'
 import logo from './logo.png';
 
 
@@ -27,7 +27,7 @@ const config = {
   parent: 'phaser-example',
   width: 800,
   height: 600,
-  scene: class extends System.Scene {
+  scene: class extends Scene {
     constructor(...params) {
       super(...params);
       this.runSystem(Bouncer);
@@ -37,7 +37,7 @@ const config = {
       this.load.image('logo', logo);
     }
     create() {
-      this.entity(this.add.image(400, 500, 'logo').setOrigin(.5, .5));
+      this.addEntity(this.add.image(400, 500, 'logo').setOrigin(.5, .5));
     }
   },
 };

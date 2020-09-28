@@ -11,12 +11,10 @@ const States = {
 export default class Entry extends Context {
     constructor(registry) {
         super();
+        // Entity to test value.
         for (let state of Object.values(States)) {
             this[state] = new Set();
         }
-        this.dirtyObserves = [];
-        this.dirtyRemovals = [];
-        this.isUpdating = false;
         this.registry = registry;
         // Set by the registry.
         this.system = null;
@@ -43,11 +41,7 @@ export default class Entry extends Context {
     }
 
     /** Registry methods. */
-    doObservation(entity) {
-        if (this.isUpdating) {
-            this.dirtyObserves.push(entity);
-            return;
-        }
+    doObserve(entity) {
         let has = this.getEntityState(entity);
         // 3 values:
         // true to subscribe & indicate change (add/update),
@@ -74,15 +68,8 @@ export default class Entry extends Context {
         // Otherwise, we don't have enough information to make a change.
         // So don't change anything!
     }
-    doRemoval(entity, hard, now) {
-        if (!now && this.isUpdating) {
-            this.dirtyRemovals.push(entity);
-            return;
-        }
+    doRemove(entity, hard) {
         let has = this.getEntityState(entity);
-        if (hard) {
-            return this.updateState(entity, has, undefined);
-        }
         switch (has) {
             case undefined: return undefined;
             case States.added: return this.updateState(entity, has, States.premoved);
@@ -103,22 +90,6 @@ export default class Entry extends Context {
             for (let entity of this[state]) {
                 this.updateState(entity, state, States.unchanged);
             }
-        }
-        // Handle anything that was touched while we were updating.
-        let dirtyObserves = this.dirtyObserves;
-        let dirtyRemovals = this.dirtyRemovals;
-        if (dirtyObserves.length > 0) {
-            this.dirtyObserves = [];
-        }
-        if (dirtyRemovals.length > 0) {
-            this.dirtyRemovals = [];
-        }
-        this.isUpdating = false;
-        for (let entity of dirtyObserves) {
-            this.observe(entity);
-        }
-        for (let entity of dirtyRemovals) {
-            this.remove(entity);
         }
     }
 

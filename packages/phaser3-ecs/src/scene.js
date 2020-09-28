@@ -1,31 +1,31 @@
-import {Registry} from '@browndragon/ecs';
+import Registry from './registry';
 // Peer dependency, don't import or you'll get a second copy! Use the global instead.
 // import Phaser from 'phaser';
 
 export default class Scene extends Phaser.Scene {
     constructor(...params) {
         super(...params);
-        this[R] = new Registry();
+        this[R] = new Registry(this);
     }
     runSystem(System) {
-        this[R].add(System, this);
+        this[R].register(System);
         return this;
     }
-    addEntity(gameObject) {
-        this[R].observe(gameObject);
+    addEntity(gameObject, pin=undefined) {
+        this[R].observe(gameObject, pin);
     }
-    removeEntity(gameObject, hard, now) {
-        this[R].remove(gameObject, hard, now);
+    removeEntity(gameObject) {
+        this[R].remove(gameObject);
     }
 
     preload() {
-        this[R].forEach(preload);
+        this[R].forEachSystem(preload);
     }
     create() {
-        this[R].forEach(create);
+        this[R].forEachSystem(create);
     }
     update(time, delta) {
-        this[R].update({time, delta});
+        this[R].update(time, delta);
     }
 }
 function preload(s) { s.preload() }
