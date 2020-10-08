@@ -1,8 +1,11 @@
 {
-  "name": "@browndragon/phaser3-ecs-examples",
+  "name": "phaser3-plugin",
   "version": "0.0.7",
-  "private": true,
-  "description": "Repo of examples for @browndragon/phaser3-ecs",
+  "description": "An es6-style phaser.io base plugin class for scene plugins with an update cycle (like: tweens, animations, constraints, etc).",
+  "keywords": [
+    "phaser-plugin",
+    "phaser"
+  ],
   "author": "Brown Dragon <browndragon@googlegroups.com>",
   "homepage": "https://github.com/browndragon/lair#readme",
   "license": "MIT",
@@ -12,9 +15,6 @@
   ],
   "main": "lib/index.js",
   "module": "src/index.js",
-  "publishConfig": {
-    "access": "public"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/browndragon/lair.git"
@@ -25,8 +25,17 @@
   "bugs": {
     "url": "https://github.com/browndragon/lair/issues"
   },
-  "dependencies": {
-    "@browndragon/phaser3-ecs": "file:../phaser3-ecs",
+  "peerDependencies": {
     "phaser": "^3.24.1"
+  },
+  "dependencies": {
+    "@browndragon/sm": "file:../sm"
+  },
+  "peerDependencies": {
+    "phaser": "^3.24.1"
+  },
+  "devDependencies": {
+    "phaser": "^3.24.1",
+    "@browndragon/destructure": "file:../destructure"
   }
 }

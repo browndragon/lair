@@ -1,20 +1,19 @@
 {
-  "name": "@browndragon/phaser3-ecs",
+  "name": "@browndragon/sm",
   "version": "0.0.7",
-  "description": "An entity component system plugin using phaser3 for the entities and components.",
+  "description": "Tiny little functional intrinsic state machine.",
   "keywords": [
-    "phaser3",
-    "ECS"
+    "statemachine"
   ],
   "author": "Brown Dragon <browndragon@googlegroups.com>",
   "homepage": "https://github.com/browndragon/lair#readme",
   "license": "MIT",
+  "main": "lib/index.js",
+  "module": "src/index.js",
   "files": [
     "lib/*",
     "!/**/*.test.js"
   ],
-  "main": "lib/index.js",
-  "module": "src/index.js",
   "publishConfig": {
     "access": "public"
   },
@@ -27,15 +26,5 @@
   },
   "bugs": {
     "url": "https://github.com/browndragon/lair/issues"
-  },
-  "dependencies": {
-    "@browndragon/ecs": "file:../ecs",
-    "is-empty-object": "^1.1.1"
-  },
-  "peerDependencies": {
-    "phaser": "^3.24.1"
-  },
-  "devDependencies": {
-    "phaser": "^3.24.1"
   }
 }

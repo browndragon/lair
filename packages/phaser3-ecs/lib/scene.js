@@ -8,7 +8,7 @@ export default class Scene extends Phaser.Scene {
         this[R] = new Registry(this);
     }
     runSystem(System) {
-        this[R].add(System);
+        this[R].register(System);
         return this;
     }
     addEntity(gameObject, pin = undefined) {
@@ -19,13 +19,13 @@ export default class Scene extends Phaser.Scene {
     }
 
     preload() {
-        this[R].forEach(preload);
+        this[R].forEachSystem(preload);
     }
     create() {
-        this[R].forEach(create);
+        this[R].forEachSystem(create);
     }
     update(time, delta) {
-        this[R].update({ time, delta });
+        this[R].update(time, delta);
     }
 }
 function preload(s) {

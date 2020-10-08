@@ -1,11 +1,7 @@
 {
-  "name": "@browndragon/phaser3-ecs",
+  "name": "@browndragon/phaser3-constraint",
   "version": "0.0.7",
-  "description": "An entity component system plugin using phaser3 for the entities and components.",
-  "keywords": [
-    "phaser3",
-    "ECS"
-  ],
+  "description": "An arcade physics type for enforcing relationships between objects",
   "author": "Brown Dragon <browndragon@googlegroups.com>",
   "homepage": "https://github.com/browndragon/lair#readme",
   "license": "MIT",
@@ -28,14 +24,8 @@
   "bugs": {
     "url": "https://github.com/browndragon/lair/issues"
   },
-  "dependencies": {
-    "@browndragon/ecs": "file:../ecs",
-    "is-empty-object": "^1.1.1"
-  },
   "peerDependencies": {
     "phaser": "^3.24.1"
-  },
-  "devDependencies": {
-    "phaser": "^3.24.1"
   }
+
 }

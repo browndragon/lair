@@ -31,7 +31,7 @@ export default class ClassTree {
 }
 function _prototypeChain(clazzPrototype, rootClassPrototype) {
     let chain = [];
-    while(true) {
+    while (true) {
         if (clazz == undefined) {
             return chain;
         }
