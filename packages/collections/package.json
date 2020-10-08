@@ -1,6 +1,6 @@
 {
   "name": "@browndragon/collections",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "Collection datastructures in the style of es6: Multimaps, SortedSets and SortedMaps, as well as the row & column-indexed Table.",
   "author": "Brown Dragon <browndragon@googlegroups.com>",
   "homepage": "https://github.com/browndragon/lair#readme",

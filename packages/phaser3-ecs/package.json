@@ -1,6 +1,6 @@
 {
   "name": "@browndragon/phaser3-ecs",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "An entity component system plugin using phaser3 for the entities and components.",
   "keywords": [
     "phaser3",
