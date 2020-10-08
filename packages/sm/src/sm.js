@@ -40,6 +40,8 @@ export default class SM {
     step(...params) {
         this.params = params;
         while (this._increment() && this.prev != this.next) {}
+        // Once we quiesce, the next time we enter a state will be because of a
+        // new call to `step`, so clear out the params to avoid confusion.
         this.params = undefined;
         return this;
     }
@@ -47,7 +49,7 @@ export default class SM {
     // Internally cause a transition, setting the next state method to run.
     // If the new state is different than the current state, leaves the current state and returns true, targeting the new state on the next step.
     // If it's the same, stays in the same state and returns false.
-    transition(stateKey, params) {
+    transition(stateKey, ...params) {
         if (stateKey) {
             console.assert(stateKey in this.states);
         }
@@ -63,9 +65,9 @@ export default class SM {
     }
 
     /** Hook before a nontrivial increment is attempted. */
-    before(params) {}
+    before() {}
     /** Hook when the next increment will be nontrivial. */
-    after(params) {}
+    after() {}
 
 
     _increment() {
@@ -82,7 +84,7 @@ export default class SM {
         const state = this.states[nextWas];
         console.assert(state);
         const needsAnotherCall = state.call(
-            this.states, this, ...(this.params || [])
+            this.states, this, ...this.params
         );
         // if the previous shifted out from under us, there was a concurrent modification. Horrifying. Abort.
         console.assert(this.prev == prevWas);

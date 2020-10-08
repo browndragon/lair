@@ -1,1 +1,1 @@
-export { default as SM } from './sm';
+export { default } from './sm';

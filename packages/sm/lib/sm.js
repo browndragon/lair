@@ -17,6 +17,7 @@ export default class SM {
         this.prev = undefined;
         // The next state method to run. Has not completed execution yet.
         this.next = undefined;
+        this.params = [];
     }
 
     // Convenience accessor; I kept typing this.
@@ -29,10 +30,10 @@ export default class SM {
     }
 
     // Externally transition into the given state (such as on startup).
-    // This sets `next` but does NOT enter it (that's for `step` to do).
-    // As a result, during setup, you may need to call new `SM(...).reset('start').step(someParams)` if you need to actually enter an initialization phase.
-    reset(stateKey = undefined) {
+    // This sets the next transition & its params, then executes the step.
+    reset(stateKey = undefined, ...params) {
         this.transition(stateKey);
+        this.step(...params);
         return this;
     }
 
@@ -41,55 +42,58 @@ export default class SM {
     // If the method wishes to progress, it must call `transition` inside itself.
     // Returns this object.
     step(...params) {
-        while (true
-        // Try the next state; if it says we're done we're done, otherwise...
-        && this._increment(...params)
-        // If it wanted to continue AND there's a real transition, continue.
-        && this.prev != this.next) {}
+        this.params = params;
+        while (this._increment() && this.prev != this.next) {}
+        // Once we quiesce, the next time we enter a state will be because of a
+        // new call to `step`, so clear out the params to avoid confusion.
+        this.params = undefined;
         return this;
     }
 
     // Internally cause a transition, setting the next state method to run.
     // If the new state is different than the current state, leaves the current state and returns true, targeting the new state on the next step.
     // If it's the same, stays in the same state and returns false.
-    transition(stateKey) {
+    transition(stateKey, ...params) {
         if (stateKey) {
             console.assert(stateKey in this.states);
+        }
+        if (stateKey === undefined) {
+            return false;
         }
         if (this.next == stateKey) {
             return false;
         }
         this.next = stateKey;
+        this.params = params;
         return true;
     }
 
     /** Hook before a nontrivial increment is attempted. */
-    before(params) {}
+    before() {}
     /** Hook when the next increment will be nontrivial. */
-    after(params) {}
+    after() {}
 
-    _increment(...params) {
-        // Go before the transition 
-        if (this.next != this.prev) {
-            this.before(params);
-        }
-        // If we're not in any state, we cannot step.
+    _increment() {
         if (!this.next) {
             return false;
+        }
+        // Go before the transition 
+        if (this.next != this.prev) {
+            this.before();
         }
 
         const prevWas = this.prev;
         const nextWas = this.next;
         const state = this.states[nextWas];
         console.assert(state);
-        const needsAnotherCall = state.call(this.states, this, ...params);
+        const needsAnotherCall = state.call(this.states, this, ...this.params);
         // if the previous shifted out from under us, there was a concurrent modification. Horrifying. Abort.
         console.assert(this.prev == prevWas);
         // We expect/allow next to move, though, so use the copy we grabbed.
         this.prev = nextWas;
 
         if (this.next != this.prev) {
-            this.after(params);
+            this.after();
         }
 
         return needsAnotherCall;

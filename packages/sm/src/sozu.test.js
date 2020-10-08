@@ -6,6 +6,7 @@ test('SozuFlow', () => {
         fullness: 0,
         capacity: 100,
         filling(sm, amount) {
+            expect(Number.isFinite(amount)).toBeTruthy();
             this.fullness += amount;
             if (this.fullness >= this.capacity) {
                 return sm.transition('dumping');
