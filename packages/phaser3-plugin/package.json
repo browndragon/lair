@@ -1,6 +1,6 @@
 {
   "name": "@browndragon/phaser3-plugin",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "An es6-style phaser.io base plugin class for scene plugins with an update cycle (like: tweens, animations, constraints, etc).",
   "keywords": [
     "phaser-plugin",
@@ -31,11 +31,8 @@
   "dependencies": {
     "@browndragon/sm": "file:../sm"
   },
-  "peerDependencies": {
-    "phaser": "^3.24.1"
-  },
   "devDependencies": {
-    "phaser": "^3.24.1",
-    "@browndragon/destructure": "file:../destructure"
+    "@browndragon/destructure": "file:../destructure",
+    "phaser": "^3.24.1"
   }
 }

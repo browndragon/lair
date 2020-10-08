@@ -1,7 +1,7 @@
 {
   "name": "@browndragon/phaser3-constraint",
   "private": true,
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "An arcade physics type for enforcing relationships between objects",
   "author": "Brown Dragon <browndragon@googlegroups.com>",
   "homepage": "https://github.com/browndragon/lair#readme",
@@ -28,5 +28,4 @@
   "peerDependencies": {
     "phaser": "^3.24.1"
   }
-
 }
