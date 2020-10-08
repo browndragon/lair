@@ -15,6 +15,9 @@
   ],
   "main": "lib/index.js",
   "module": "src/index.js",
+  "publishConfig": {
+    "access": "public"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/browndragon/lair.git"
