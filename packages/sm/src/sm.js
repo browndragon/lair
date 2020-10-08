@@ -64,9 +64,9 @@ export default class SM {
         return true;
     }
 
-    /** Hook before a nontrivial increment is attempted. */
+    /** Hook before a nontrivial transition is attempted. */
     before() {}
-    /** Hook when the next increment will be nontrivial. */
+    /** Hook when the next transition will be nontrivial. */
     after() {}
 
 

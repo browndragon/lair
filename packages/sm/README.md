@@ -2,6 +2,8 @@
 
 A tiny little state machine driver.
 
+## States
+
 A set of states is an object made of methods that take the state machine instance and potentially additional parameters, like:
 ```js
 // src/onoff.test.js#L4-L7
@@ -11,7 +13,51 @@ export const States = {
     off(sm) {sm.transition('on')},
 };
 ```
-You can make this into a state machine and drive it using the SM object and its `reset` method to tell it where to start and its `step` method to make transitions:
+
+You can use an es6 class based object too, of course; the only thing that's important is that you be able to return the names of your methods.
+
+Each method is a `state`; a `state` is a function whose first parameter is a state machine instance.
+
+> Tip: If you're concerned about minification, you can always use `Symbol`s, since then you can guarantee what-you-return is what-you-see.
+
+## State machines
+
+This class provides the State Machine implementation, tersely termed `SM`.
+
+It has 3 critical methods:
+* Call `reset(state, ...params)` before any other methods, from **outside** of a `state` method: This immediately transitions & steps the state machine into the given state.
+* Call `transition(state, ...params)` from **inside** of a `state` method: to modify the state of this state machine so that it will enter the named state (from the current state). Multiple calls to transition will result only in the latest call being used. If the `state` method returns true, the transition will happen immediately. If the `state` method returns false, the transition will happen **on the next call to `step` with the params provided to transition ignored**. Returns true if the given state is different than the current state.
+* Call `step(...params)` from **outside** of a `state` method: call the current state method with the given params (instead of any given when it transitioned)
+
+> Tip: If you want to transition into a state and do some work immediately, but then await another external call before doing anything else, you can use a "verb/return false" pattern:
+```js
+// src/ramp.test.js#L4-L23
+
+const States = {
+    ramp(sm, dir) {
+        console.log(`Powering ${dir}`);
+        return sm.transition(dir, true);
+    },
+    on(sm, ramped) {
+        if (ramped) {
+            console.log('on');
+            return false;
+        }
+        return sm.transition('ramp', 'off');
+    },
+    off(sm, ramped) {
+        if (ramped) {
+            console.log('off');
+            return false;
+        }
+        return sm.transition('ramp', 'on');
+    }
+};
+```
+
+## Example State Machines
+
+You can make the "OnOff" example above into a state machine and drive it using the SM object and its `reset` method to tell it where to start and its `step` method to make transitions:
 ```js
 // src/onoff.test.js#L10-L16
 
@@ -23,7 +69,7 @@ expect(machine.prev).toEqual('on');
 machine.step();
 expect(machine.prev).toEqual('off');
 ```
-SM's `before` and `after` can be overridden to handle cross-cutting behaviors:
+`SM`'s `before` and `after` can be overridden to handle cross-cutting behaviors:
 ```js
 // src/onoff.test.js#L21-L29
 
