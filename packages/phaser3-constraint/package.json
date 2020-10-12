@@ -27,5 +27,11 @@
   },
   "peerDependencies": {
     "phaser": "^3.24.1"
+  },
+  "dependencies": {
+    "@browndragon/phaser3-plugin": "file:../phaser3-plugin"
+  },
+  "devDependencies": {
+    "phaser": "^3.24.1"
   }
 }

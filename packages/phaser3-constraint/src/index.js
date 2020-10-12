@@ -1,14 +1,17 @@
-import Bonded from './bonded';
-// import Phaser from 'phaser';  // Peer dependency; user must import this!
-
-class BondedImage extends Bonded(Phaser.GameObjects.Image) {}
-class BondedSprite extends Bonded(Phaser.GameObjects.Sprite) {}
-class BondedArcadeSprite extends Bonded(Phaser.Physics.Arcade.Sprite) {}
+import Cluster from './cluster';
+import Corner from './corner';
+import Pair from './pair';
+import Plugin from './plugin';
+import {Damp, Limit, PointMass, Spring} from './force';
 
 export default {
-    Bonded,
-    BondedImage,
-    BondedSprite,
-    BondedArcadeSprite,
-    
+    Cluster,
+    Corner,
+    Pair,
+    Plugin,
+
+    Damp,
+    Limit,
+    PointMass,
+    Spring,
 };

@@ -22,7 +22,8 @@
     "webpack": "^4.41.2",
     "webpack-cli": "^3.3.12",
     "webpack-dev-server": "^3.9.0",
-    "webpack-merge": "^4.2.2"
+    "webpack-merge": "^4.2.2",
+    "jest-canvas-mock": "^2.2.0"
   },
   "type": "module",
   "scripts": {
@@ -36,6 +37,9 @@
   },
   "jest": {
     "cacheDirectory": ".jest-cache",
+    "setupFiles": [
+      "jest-canvas-mock"
+    ],
     "moduleFileExtensions": [
       "js",
       "jsx",

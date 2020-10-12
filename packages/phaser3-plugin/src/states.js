@@ -143,11 +143,11 @@ class States extends Phaser.Events.EventEmitter {
     pause() { this.state.step(Verbs.pause); return this; }
     /** Restores from pause (playing or queued). */
     resume() { this.state.step(Verbs.resume); return this; }
-    /** Pauses playback of this object. */
+    /** Forces this object out of active, and towards being destroyed. */
     stop() { this.state.step(Verbs.stop); return this; }
-    /** Pauses playback of this object. */
+    /** Forces this object into active. */
     play() { this.state.step(Verbs.play); return this; }
-    /** Pauses playback of this object. */
+    /** Indicates this object is being trashed. */
     destroy() { this.state.step(Verbs.destroy); return this; }
 }
 

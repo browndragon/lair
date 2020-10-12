@@ -4,7 +4,7 @@
   "description": "An es6-style phaser.io base plugin class for scene plugins with an update cycle (like: tweens, animations, constraints, etc).",
   "keywords": [
     "phaser-plugin",
-    "phaser3",
+    "phaser3"
   ],
   "author": "Brown Dragon <browndragon@googlegroups.com>",
   "homepage": "https://github.com/browndragon/lair#readme",
