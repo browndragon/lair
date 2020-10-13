@@ -2,23 +2,41 @@
 
 /** A standin for a position, velocity, and mass. */
 export default class PointMass {
+    /**
+     * @param {
+     *  Phaser.Types.Math.Vector2Like
+     * |Phaser.GameObjects.GameObject
+     * |Phaser.Physics.Arcade.Body
+     * } object - The body being tracked. If unset, [0, 0]. Prefers the arcade body (if any).
+     * @param {Phaser.Types.Math.Vector2Like=} offset - Optional offset within the `object` to anchor the point mass. If unset, uses the center of the `object`.
+     * @param {number=} mass - Mass to use for this object if set, otherwise, mass from the `object` or its body.
+     */
     constructor(object, offset=undefined, mass=undefined) {
         if (object instanceof PointMass) {
             object = object.object;
         }
         this._object = object;
-        this._offset = offset;
+        this._offset = offset ? new Phaser.Math.Vector2(offset) : offset;
         this._mass = mass;
     }
     static ensure(obj, offset) {
-        if (obj == undefined) {
+        if (!obj && !offset) {
             throw new TypeError();
         }
         if (obj instanceof PointMass) {
-            // TODO: Handle checking offset matches.
-            return obj;
+            if (offset === undefined) {
+                return obj;
+            }
+            if (obj._offset == offset) {
+                return obj;
+            }
+            if (obj._offset && offset) {
+                if (obj._offset.x == offset.x && obj._offset.y == offset.y) {
+                    return obj;
+                }
+            }
         }
-        return new PointMass(obj);
+        return new PointMass(obj, offset);
     }
     get object() {
         return this._object;

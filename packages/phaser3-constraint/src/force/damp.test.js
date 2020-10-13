@@ -3,7 +3,6 @@ import { describe, test, expect } from '@jest/globals';
 
 import Damp from './damp';
 import PointMass from './pointMass';
-import Limit from './limit';
 
 const DebugForce = {
     toString() {
@@ -60,7 +59,7 @@ describe('Damp forces', () => {
         const pma = new PointMass({body:a});
         const pmb = new PointMass({body:b});
         let basicForce = DebugForce.force(pma, pmb);
-        let actualForce = new Damp(damp, DebugForce).force(pma, pmb);
+        let actualForce = (new Damp(damp, DebugForce)).force(pma, pmb);
         expect(actualForce).not.toBeUndefined();
         expect(basicForce).not.toBeUndefined();
         expect(

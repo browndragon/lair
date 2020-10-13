@@ -1,7 +1,8 @@
+import Compound from './compound';
 import Damp from './damp';
+import Fixed from './fixed';
 import Force from './force';
-import Limit from './limit';
 import PointMass from './pointMass';
 import Spring from './spring';
 
-export {Damp, Force, Limit, PointMass, Spring};
+export {Compound, Damp, Force, PointMass, Spring};

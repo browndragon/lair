@@ -2,7 +2,7 @@ import Cluster from './cluster';
 import Corner from './corner';
 import Pair from './pair';
 import Plugin from './plugin';
-import {Damp, Limit, PointMass, Spring} from './force';
+import {Compound, Damp, Fixed, Force, PointMass, Spring} from './force';
 
 export default {
     Cluster,
@@ -10,8 +10,10 @@ export default {
     Pair,
     Plugin,
 
+    Compound,
     Damp,
-    Limit,
+    Fixed,
+    Force,
     PointMass,
     Spring,
 };
