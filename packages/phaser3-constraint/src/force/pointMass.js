@@ -15,6 +15,7 @@ export default class PointMass {
             throw new TypeError();
         }
         if (obj instanceof PointMass) {
+            // TODO: Handle checking offset matches.
             return obj;
         }
         return new PointMass(obj);
