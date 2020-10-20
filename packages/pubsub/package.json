@@ -1,7 +1,7 @@
 {
   "name": "@browndragon/pubsub",
   "private": true,
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "Quick pubsub shim/toy for @browndragon/ecs",
   "author": "Brown Dragon <browndragon@googlegroups.com>",
   "homepage": "https://github.com/browndragon/lair#readme",
