@@ -1,6 +1,6 @@
 {
   "name": "@browndragon/phaser3-ecs",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "An entity component system plugin using phaser3 for the entities and components.",
   "keywords": [
     "phaser3",
@@ -29,7 +29,7 @@
     "url": "https://github.com/browndragon/lair/issues"
   },
   "dependencies": {
-    "@browndragon/ecs": "*",
+    "@browndragon/ecs": "^0.0.11",
     "is-empty-object": "^1.1.1"
   },
   "peerDependencies": {

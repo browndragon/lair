@@ -1,7 +1,7 @@
 {
   "name": "@browndragon/collections2",
   "private": true,
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "Labs & working area for collections extensions",
   "author": "Brown Dragon <browndragon@googlegroups.com>",
   "homepage": "https://github.com/browndragon/lair#readme",

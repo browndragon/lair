@@ -1,6 +1,6 @@
 {
   "name": "@browndragon/switch-type",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "An improved `typeof` handler.",
   "keywords": [
     "typeof",
@@ -29,6 +29,6 @@
     "url": "https://github.com/browndragon/lair/issues"
   },
   "dependencies": {
-    "@browndragon/callable": "*"
+    "@browndragon/callable": "^0.0.11"
   }
 }
