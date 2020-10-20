@@ -1,8 +1,18 @@
-import { Registry as BaseRegistry } from '@browndragon/ecs';
+"use strict";
 
-export default class Registry extends BaseRegistry {
-    constructor(scene) {
-        super();
-        this.scene = scene;
-    }
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _ecs = require("@browndragon/ecs");
+
+class Registry extends _ecs.Registry {
+  constructor(scene) {
+    super();
+    this.scene = scene;
+  }
+
 }
+
+exports.default = Registry;

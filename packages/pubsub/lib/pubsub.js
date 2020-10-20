@@ -1,12 +1,20 @@
-import { Table } from '@browndragon/collections';
+"use strict";
 
-export const DELETING = Symbol('Deleting');
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = exports.NilSubscriber = exports.DELETING = void 0;
 
-export const NilSubscriber = {
-    receive(topic, message) {},
-    unsubscribe(topic) {}
+var _collections = require("@browndragon/collections");
+
+const DELETING = Symbol('Deleting');
+exports.DELETING = DELETING;
+const NilSubscriber = {
+  receive(_topic, _message) {},
+
+  unsubscribe(_topic) {}
+
 };
-
 /**
  * Asynchronous pubsub system.
  * Manage subscribers with `subscribe`.
@@ -15,51 +23,65 @@ export const NilSubscriber = {
  * Subscribe is resolved synchronously, but publish is resolved asynchronously, during a call you must make to `deliver`. As a result, there is no good pattern to remove/re-add something.
  * Which is why this is a demo.
  */
-export default class Pubsub {
-    constructor() {
-        // Rows are topics, columns are subscribers.
-        this.t = new Table();
-        this.q = [];
+
+exports.NilSubscriber = NilSubscriber;
+
+class Pubsub {
+  constructor() {
+    // Rows are topics, columns are subscribers.
+    this.t = new _collections.Table();
+    this.q = [];
+  }
+
+  subscribe(topic, subscriber) {
+    this.t.set(topic, subscriber, true);
+    return this;
+  }
+
+  unsubscribe(topic, subscriber) {
+    if (!this.t.has(topic, subscriber)) {
+      return this;
     }
 
-    subscribe(topic, subscriber) {
-        this.t.set(topic, subscriber, true);
-        return this;
+    subscriber.unsubscribe(topic);
+    this.t.delete(topic, subscriber);
+    return this;
+  }
+
+  publish(topic, message = undefined) {
+    this.q.push([topic, message]);
+    return;
+  }
+
+  delete(topic) {
+    this.publish(topic, DELETING);
+    return;
+  }
+
+  deliver() {
+    let q = this.q;
+
+    if (q.length <= 0) {
+      return;
     }
-    unsubscribe(topic, subscriber) {
-        if (!this.t.has(topic, subscriber)) {
-            return this;
+
+    this.q = [];
+
+    for (let [topic, message] of q) {
+      if (message == DELETING) {
+        for (let subscriber of this.t.colsInRow(topic)) {
+          this.unsubscribe(topic, subscriber);
         }
-        subscriber.unsubscribe(topic);
-        this.t.delete(topic, subscriber);
-        return this;
-    }
 
-    publish(topic, message = undefined) {
-        this.q.push([topic, message]);
         return;
-    }
-    delete(topic) {
-        this.publish(topic, DELETING);
-        return;
-    }
+      }
 
-    deliver() {
-        let q = this.q;
-        if (q.length <= 0) {
-            return;
-        }
-        this.q = [];
-        for (let [topic, message] of q) {
-            if (message == DELETING) {
-                for (let subscriber of this.t.colsInRow(topic)) {
-                    this.unsubscribe(topic, subscriber);
-                }
-                return;
-            }
-            for (let subscriber of this.t.colsInRow(topic)) {
-                subscriber.receive(topic, message);
-            }
-        }
+      for (let subscriber of this.t.colsInRow(topic)) {
+        subscriber.receive(topic, message);
+      }
     }
+  }
+
 }
+
+exports.default = Pubsub;

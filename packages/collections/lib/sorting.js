@@ -1,4 +1,14 @@
-import bs from 'binary-search';
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = Sorting;
+exports.DEFAULT_COMPARATOR = void 0;
+
+var _binarySearch = _interopRequireDefault(require("binary-search"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
  * Makes a datastructure which is es6-like (Set, Map) a "sorting" one, overriding the documented
@@ -19,81 +29,102 @@ import bs from 'binary-search';
  * Modifications to the datastructure mid-iteration will only be seen past the current point
  * of iteration (so inserting something alphabetically earlier will be missed).
  */
-export default function Sorting(clazz) {
-    return class extends clazz {
+function Sorting(clazz) {
+  return class extends clazz {
+    constructor(...params) {
+      super(...params);
+      this[E] = undefined;
+      this[CC] = DEFAULT_COMPARATOR;
+    }
+
+    get [Symbol.toStringTag]() {
+      return `Sorted${super[Symbol.toStringTag]}`;
+    }
+
+    static comparing(comparator) {
+      console.assert(typeof comparator == 'function');
+      return class extends this {
         constructor(...params) {
-            super(...params);
-            this[E] = undefined;
-            this[CC] = DEFAULT_COMPARATOR;
+          super(...params);
+
+          this[CC] = ([k1], [k2]) => comparator(k1, k2);
         }
 
-        get [Symbol.toStringTag]() {
-            return `Sorted${super[Symbol.toStringTag]}`;
-        }
+      };
+    }
 
-        static comparing(comparator) {
-            console.assert(typeof comparator == 'function');
-            return class extends this {
-                constructor(...params) {
-                    super(...params);
-                    this[CC] = ([k1], [k2]) => comparator(k1, k2);
-                }
-            };
-        }
-        clear() {
-            this.makeDirty();
-            return super.clear();
-        }
-        delete(...params) {
-            this.makeDirty();
-            return super.delete(...params);
-        }
-        /**
-         * Invalidates the sorted key cache.
-         */
-        makeDirty() {
-            this[E] = undefined;
-        }
-        preSort(entries) {}
-        postSort(entries) {}
-        entries(start, end) {
-            if (!this[E]) {
-                this[E] = Array.from(super.entries());
-                this.preSort(this[E]);
-                this[E] = this[E].sort(this[CC]);
-                this.postSort(this[E]);
-            }
-            return iteratorBetween(this[E], this[CC], start, end);
-        }
-        forEach(cb, thisArg, start, end) {
-            for (let [k, v] of this.entries(start, end)) {
-                cb.call(thisArg, v, k, this);
-            }
-        }
-        // Set doesn't have `keys` or we'd override that here too.
-        *values(start, end) {
-            for (let [k, v] of this.entries(start, end)) {
-                yield v;
-            }
-        }
-    };
+    clear() {
+      this.makeDirty();
+      return super.clear();
+    }
+
+    delete(...params) {
+      this.makeDirty();
+      return super.delete(...params);
+    }
+    /**
+     * Invalidates the sorted key cache.
+     */
+
+
+    makeDirty() {
+      this[E] = undefined;
+    }
+
+    preSort(_entries) {}
+
+    postSort(_entries) {}
+
+    entries(start, end) {
+      if (!this[E]) {
+        this[E] = Array.from(super.entries());
+        this.preSort(this[E]);
+        this[E] = this[E].sort(this[CC]);
+        this.postSort(this[E]);
+      }
+
+      return iteratorBetween(this[E], this[CC], start, end);
+    }
+
+    forEach(cb, thisArg, start, end) {
+      for (let [k, v] of this.entries(start, end)) {
+        cb.call(thisArg, v, k, this);
+      }
+    } // Set doesn't have `keys` or we'd override that here too.
+
+
+    *values(start, end) {
+      for (let [_k, v] of this.entries(start, end)) {
+        yield v;
+      }
+    }
+
+  };
 }
+
 const E = Symbol('SortedEntries');
 const CC = Symbol('CompareClosure');
-export const DEFAULT_COMPARATOR = ([k1], [k2]) => k1 > k2 ? 1 : k1 < k2 ? -1 : 0;
+
+const DEFAULT_COMPARATOR = ([k1], [k2]) => k1 > k2 ? 1 : k1 < k2 ? -1 : 0;
+
+exports.DEFAULT_COMPARATOR = DEFAULT_COMPARATOR;
 
 function* iteratorBetween(entries, comparator, start, end) {
-    let index = start === undefined ? 0 : bs(entries, [start], comparator);
-    if (index < 0) {
-        // On miss, the library is documented to return -(index+1).
-        // 
-        index = -(index + 1);
+  let index = start === undefined ? 0 : (0, _binarySearch.default)(entries, [start], comparator);
+
+  if (index < 0) {
+    // On miss, the library is documented to return -(index+1).
+    // 
+    index = -(index + 1);
+  }
+
+  const guard = end === undefined ? undefined : [end];
+
+  for (let i = index; i < entries.length; ++i) {
+    if (guard && comparator(entries[i], guard) >= 0) {
+      return;
     }
-    const guard = end === undefined ? undefined : [end];
-    for (let i = index; i < entries.length; ++i) {
-        if (guard && comparator(entries[i], guard) >= 0) {
-            return;
-        }
-        yield entries[i];
-    }
+
+    yield entries[i];
+  }
 }

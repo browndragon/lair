@@ -77,7 +77,7 @@ class LoggingSM extends SM {
     before() {
         console.log(`Transition into ${this.prev} -> ${this.next}`);
     }
-};
+}
 let machine = new LoggingSM(States).reset('off');
 expect(console.log).toHaveBeenCalledWith('Transition into undefined -> off');
 machine.step();
@@ -122,7 +122,7 @@ class Sublimer extends PhaseWatcher {
         }
         super.before([degC, ...rest]);
     }
-};
+}
 ```
 
 You can absolutely use this class with (ahem) stateful states, as well as automated step progression, for instance with object literal:

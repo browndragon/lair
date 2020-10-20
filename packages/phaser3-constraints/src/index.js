@@ -13,5 +13,5 @@ export default {
     Pair,
     Plugin,
 
-    ...Force,
+    ...Force
 };

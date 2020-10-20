@@ -16,7 +16,7 @@ Systems are standalone;
 ```js
 // src/greeter.test.js
 
-import { describe, test, expect } from '@jest/globals';
+import { test, expect } from '@jest/globals';
 import {Registry, System} from '.';  // '@browndragon/ecs'; <-- this is a unit test so I can't write that!
 
 test('Greeter', () => {

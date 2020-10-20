@@ -7,7 +7,7 @@ It's a base class which is `typeof(instance) == 'function'`, instances can be `a
 ```js
 // src/example.test.js
 
-import { describe, test, expect } from '@jest/globals';
+import { test, expect } from '@jest/globals';
 import Callable from './callable';
 
 test('CallableExample', () => {

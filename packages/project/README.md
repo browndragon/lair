@@ -54,7 +54,7 @@ See the unit tests, for instance:
 ```js
 // src/example.test.js
 
-import { describe, test, expect } from '@jest/globals';
+import { test, expect } from '@jest/globals';
 import project from './project';  // import project from '@browndragon/project';  <-- unit test, so I can't write that, but you can!
 
 test('Example', () => {
