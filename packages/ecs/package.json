@@ -25,6 +25,6 @@
     "url": "https://github.com/browndragon/lair/issues"
   },
   "dependencies": {
-    "@browndragon/collections": "file:../collections"
+    "@browndragon/collections": "*"
   }
 }

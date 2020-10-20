@@ -29,7 +29,7 @@
     "url": "https://github.com/browndragon/lair/issues"
   },
   "dependencies": {
-    "@browndragon/callable": "file:../callable",
-    "@browndragon/destructure": "file:../destructure"
+    "@browndragon/callable": "*",
+    "@browndragon/destructure": "*"
   }
 }

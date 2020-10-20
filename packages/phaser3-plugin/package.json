@@ -32,10 +32,10 @@
     "phaser": "^3.24.1"
   },
   "dependencies": {
-    "@browndragon/sm": "file:../sm"
+    "@browndragon/sm": "*"
   },
   "devDependencies": {
-    "@browndragon/destructure": "file:../destructure",
+    "@browndragon/destructure": "*",
     "phaser": "^3.24.1"
   }
 }

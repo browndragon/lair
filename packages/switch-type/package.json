@@ -29,6 +29,6 @@
     "url": "https://github.com/browndragon/lair/issues"
   },
   "dependencies": {
-    "@browndragon/callable": "file:../callable"
+    "@browndragon/callable": "*"
   }
 }

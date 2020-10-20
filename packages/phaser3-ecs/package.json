@@ -29,7 +29,7 @@
     "url": "https://github.com/browndragon/lair/issues"
   },
   "dependencies": {
-    "@browndragon/ecs": "file:../ecs",
+    "@browndragon/ecs": "*",
     "is-empty-object": "^1.1.1"
   },
   "peerDependencies": {
