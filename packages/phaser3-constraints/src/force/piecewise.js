@@ -3,30 +3,30 @@ import Force from './force';
 /**
  * Applies one of two different forces based on whether the distance between the applied bodies is less than, or greater than, some divider distance.
  */
-export default class Compound extends Force {
+export default class Piecewise extends Force {
     /**
      * @param {number} div - An arbitrary distance (so: positive values only). 
      */
     constructor(div, before, after) {
         super();
-        this._div = div * div;
+        this._divSq = div * div;
         this.before = before;
         this.after = after;
     }
     toString() {
-        return `Compound(${this.before}<${this.div}<=${this.after})`;
+        return `Or(${this.before}<${this.div}<=${this.after})`;
     }
     get div() {
-        return Math.sqrt(this._div);
+        return Math.sqrt(this._divSq);
     }
     set div(div) {
-        this._div = div * div;
+        this._divSq = div * div;
     }
 
     /** By convention, the force on object A. */
     force(pma, pmb) {
         let distanceSq = pma.position.distanceSq(pmb.position);
-        if (distanceSq < this._div) {
+        if (distanceSq < this._divSq) {
             if (this.before) {
                 return this.before.force(pma, pmb);
             }

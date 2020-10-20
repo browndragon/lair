@@ -106,7 +106,7 @@ export default {
             // Handle maps etc.
             if ('keys' in o) { return o.keys(); }
             // Handle sets (, tables, etc).
-            return Array.from(o.entries(), ([v, k]) => k);
+            return Array.from(o.entries(), ([_v, k]) => k);
         }
         if (this.isObject(o)) {
             return Object.keys(o);

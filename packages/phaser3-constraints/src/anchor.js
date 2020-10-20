@@ -1,7 +1,10 @@
 // import Phaser from 'phaser';
 
-/** A standin for a position, velocity, and mass. */
-export default class PointMass {
+/**
+ * A standin for a position & velocity bodies in this library.
+ * It's mostly very similar to Arcade Physics Body, but since it has an additional offset, it attaches to a specific point somewhere on a physics body.
+ */
+export default class Anchor {
     /**
      * @param {
      *  Phaser.Types.Math.Vector2Like
@@ -9,21 +12,19 @@ export default class PointMass {
      * |Phaser.Physics.Arcade.Body
      * } object - The body being tracked. If unset, [0, 0]. Prefers the arcade body (if any).
      * @param {Phaser.Types.Math.Vector2Like=} offset - Optional offset within the `object` to anchor the point mass. If unset, uses the center of the `object`.
-     * @param {number=} mass - Mass to use for this object if set, otherwise, mass from the `object` or its body.
      */
-    constructor(object, offset=undefined, mass=undefined) {
-        if (object instanceof PointMass) {
+    constructor(object, offset=undefined) {
+        if (object instanceof Anchor) {
             object = object.object;
         }
         this._object = object;
         this._offset = offset ? new Phaser.Math.Vector2(offset) : offset;
-        this._mass = mass;
     }
     static ensure(obj, offset) {
         if (!obj && !offset) {
             throw new TypeError();
         }
-        if (obj instanceof PointMass) {
+        if (obj instanceof Anchor) {
             if (offset === undefined) {
                 return obj;
             }
@@ -36,7 +37,7 @@ export default class PointMass {
                 }
             }
         }
-        return new PointMass(obj, offset);
+        return new Anchor(obj, offset);
     }
     get object() {
         return this._object;
@@ -44,9 +45,7 @@ export default class PointMass {
     get position() {
         let cursor = this._object;
 
-        if (!cursor) {
-            return this._offset;
-        }
+        if (!cursor) { return this._offset }
 
         if (cursor.body) {
             cursor = cursor.body;
@@ -61,33 +60,57 @@ export default class PointMass {
         }
 
         if (this._offset) {
-            cursor = cursor.add(this.offset);
+            cursor = cursor.add(this._offset);
         }
 
         console.assert(Number.isFinite(cursor.x));
         console.assert(Number.isFinite(cursor.y));
         return cursor;
     }
+    get width() {
+        return this.constructor.width(this._object);
+    }
+    static width(cursor) {
+        if (!cursor) { return 0 }
+        if (cursor.body) {
+            cursor = cursor.body;
+        }
+        return cursor.width;
+    }
+    get height() {
+        return this.constructor.height(this._object);
+    }
+    static height(cursor) {
+        if (!cursor) { return 0 }
+        if (cursor.body) {
+            cursor = cursor.body;
+        }
+        return cursor.height;
+    }
     get velocity() {
         let cursor = this._object;
         if (!cursor) {
             return undefined;
         }
-        if (!cursor.body) {
+        if (cursor.body) {
+            cursor = cursor.body;
+        }
+        if (!cursor.velocity) {
             return undefined;
         }
-        return new Phaser.Math.Vector2(cursor.body.velocity);
+        return new Phaser.Math.Vector2(cursor.velocity);
     }
-    get mass() {
-        if (this._mass != undefined) {
-            return this._mass;
-        }
-        if (this.object == undefined) {
-            return undefined;
-        }
-        if (this.object.body == undefined) {
-            return undefined;
-        }
-        return this.object.body.mass;
+    relative(other) {
+        other = this.constructor.ensure(other);
+        return [
+            this.position.subtract(other.position),
+            this.velocity.subtract(other.velocity),
+        ];
+    }
+    /** Scales the rPos vector to the component in the rVeloc direction. */
+    static project(rPos, rVeloc) {
+        rPos.normalize();
+        rPos.scale(rVeloc.dot(rPos));
+        return rPos;
     }
 }

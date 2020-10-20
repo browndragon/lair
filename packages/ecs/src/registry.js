@@ -1,4 +1,3 @@
-import {Multimap, Table} from '@browndragon/collections';
 import Entry from './entry';
 
 /**

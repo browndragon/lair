@@ -10,10 +10,11 @@
     "babel-loader": "^8.1.0",
     "clean-webpack-plugin": "^3.0.0",
     "embedme": "^1.22.0",
-    "eslint": "^7.9.0",
+    "eslint": "^7.11.0",
     "file-loader": "^4.2.0",
     "html-webpack-plugin": "^3.2.0",
     "jest": "^26.4.2",
+    "jest-canvas-mock": "^2.2.0",
     "jest-environment-node": "^26.3.0",
     "lerna": "^3.22.1",
     "phaser": "^3.24.1",
@@ -22,8 +23,7 @@
     "webpack": "^4.41.2",
     "webpack-cli": "^3.3.12",
     "webpack-dev-server": "^3.9.0",
-    "webpack-merge": "^4.2.2",
-    "jest-canvas-mock": "^2.2.0"
+    "webpack-merge": "^4.2.2"
   },
   "type": "module",
   "scripts": {
@@ -32,8 +32,10 @@
     "build": "npm run build:embedme && npm run build:babel",
     "test": "jest",
     "test:debug": "node --inspect-brk node_modules/.bin/jest --runInBand",
+    "start:phaser3-constraints": "cd ./packages/phaser3-constraints/examples && webpack-dev-server --config ../../../webpack/base.cjs --open",
     "start:phaser3-ecs": "cd ./packages/phaser3-ecs/examples && webpack-dev-server --config ../../../webpack/base.cjs --open",
-    "start:phaser3-plugin": "cd ./packages/phaser3-plugin/examples && webpack-dev-server --config ../../../webpack/base.cjs --open"
+    "start:phaser3-plugin": "cd ./packages/phaser3-plugin/examples && webpack-dev-server --config ../../../webpack/base.cjs --open",
+    "lint": "lerna exec eslint src/**/*.js"
   },
   "jest": {
     "cacheDirectory": ".jest-cache",
@@ -73,6 +75,7 @@
     "@browndragon/ecs": "file:packages/ecs",
     "@browndragon/func": "file:packages/func",
     "@browndragon/obj": "file:packages/obj",
+    "@browndragon/phaser3-constraints": "file:packages/phaser3-constraints",
     "@browndragon/phaser3-ecs": "file:packages/phaser3-ecs",
     "@browndragon/phaser3-plugin": "file:packages/phaser3-plugin",
     "@browndragon/project": "file:packages/project",

@@ -68,7 +68,7 @@ export default class Entry extends Context {
         // Otherwise, we don't have enough information to make a change.
         // So don't change anything!
     }
-    doRemove(entity, hard) {
+    doRemove(entity) {
         let has = this.getEntityState(entity);
         switch (has) {
             case undefined: return undefined;

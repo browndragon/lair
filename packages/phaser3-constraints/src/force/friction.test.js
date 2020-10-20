@@ -1,9 +1,9 @@
-import Phaser from 'phaser';
+import _Phaser from 'phaser';
 import { describe, test, expect } from '@jest/globals';
 
-import Compound from './compound';
-import Force from './force';
-import PointMass from './pointMass';
+import Force from './fixed';
+import Piecewise from './piecewise';
+import Anchor from '../anchor';
 
 class DebugForce extends Force {
     constructor(str) {
@@ -11,13 +11,13 @@ class DebugForce extends Force {
         this.str = str;
     }
     toString() { return this.str }
-    force(a, b) {
+    force(_a, _b) {
         return this.str;
     }
 }
 const Near = new DebugForce('Near');
 const Far = new DebugForce('Far');
-const compound = new Compound(10, Near, Far);
+const testing = new Piecewise(10, Near, Far);
 
 describe('Limit forces', () => {
     test.each([
@@ -27,7 +27,7 @@ describe('Limit forces', () => {
         [{x:0, y:0}, {x:-50, y:0}, 'Far'],
     ])('%# Limit(%p, %p)=%p', (a, b, e) => {
         expect(
-            compound.force(new PointMass(a), new PointMass(b))
+            testing.force(new Anchor(a), new Anchor(b))
         ).toEqual(e);
     });   
 });

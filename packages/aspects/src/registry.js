@@ -1,5 +1,3 @@
-import {Table} from '@browndragon/collections';
-
 export default class Registry {
     constructor() {
         this.aspects = new Map();

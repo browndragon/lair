@@ -62,8 +62,8 @@ describe.each([
         keysIn(...params) { return t.keysInRow(...params); },
         otherKeysIn(...params) { return t.colsInRow(...params); },
         valuesIn(...params) { return t.valuesInRow(...params); },
-        otherKeysOf([[r, c], v]) { return c; },
-        data(rows, cols) { return rows; },
+        otherKeysOf([[_r, c], _v]) { return c; },
+        data(rows, _cols) { return rows; },
         t
     })],
     ['Cols', (t) => ({
@@ -72,8 +72,8 @@ describe.each([
         keysIn(...params) { return t.keysInCol(...params); },
         otherKeysIn(...params) { return t.rowsInCol(...params); },
         valuesIn(...params) { return t.valuesInCol(...params); },
-        otherKeysOf([[r, c], v]) { return r; },
-        data(rows, cols) { return cols; },
+        otherKeysOf([[r, _c], _v]) { return r; },
+        data(_rows, cols) { return cols; },
         t
     })],
 ])('Linetype %s', (nick, m) => {
@@ -107,7 +107,7 @@ describe.each([
             test(`keysIn ${q}`, () => expect(
                 Array.from(t.keysIn(q))
             ).toEqual(
-                vs.map(([[r, c], v]) => [r, c])
+                vs.map(([[r, c], _v]) => [r, c])
             ));
             test(`otherKeysIn ${q}`, () => expect(
                 Array.from(t.otherKeysIn(q))
@@ -117,7 +117,7 @@ describe.each([
             test(`valuesIn ${q}`, () => expect(
                 Array.from(t.valuesIn(q))
             ).toEqual(
-                vs.map(([[r, c], v]) => v)
+                vs.map(([[_r, _c], v]) => v)
             ));
         }
     });

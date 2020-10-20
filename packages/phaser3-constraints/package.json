@@ -1,5 +1,5 @@
 {
-  "name": "@browndragon/phaser3-constraint",
+  "name": "@browndragon/phaser3-constraints",
   "private": true,
   "version": "0.0.9",
   "description": "An arcade physics type for enforcing relationships between objects",

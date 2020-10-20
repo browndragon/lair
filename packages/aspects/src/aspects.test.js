@@ -103,7 +103,7 @@ describe('multipleAspects', () => {
     });
     describe('multiple elements', () => {
         let r = new Registry();
-        const data = (Aspect) => instances(r, Aspect);
+
         r.register(StoreSelf);
         r.register(Count);
         r.register(RejectConsonants);

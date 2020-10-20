@@ -1,4 +1,4 @@
-import { describe, test, expect } from '@jest/globals';
+import { test, expect } from '@jest/globals';
 import SM from './sm';  // '@browndragon/sm'; <-- this is a unit test so I can't write that!
 
 // Implements triple phase of water WITHOUT sublimation/deposition, so that
@@ -66,7 +66,7 @@ test('Sublimation', () => {
             }
             super.before([degC, ...rest]);
         }
-    };
+    }
     let machine = new Sublimer(Water).reset('liquid').step(50);
 
     machine.step(50);

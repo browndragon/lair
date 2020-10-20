@@ -1,4 +1,4 @@
-import { describe, test, expect } from '@jest/globals';
+import { jest, test, expect } from '@jest/globals';
 import SM from './sm';  // '@browndragon/sm'; <-- this is a unit test so I can't write that!
 
 export const States = {
@@ -22,7 +22,7 @@ test('OnOffOverridesBefore', () => {
         before() {
             console.log(`Transition into ${this.prev} -> ${this.next}`);
         }
-    };
+    }
     let machine = new LoggingSM(States).reset('off');
     expect(console.log).toHaveBeenCalledWith('Transition into undefined -> off');
     machine.step();
@@ -35,7 +35,7 @@ test('OnOffOverridesAfter', () => {
         after() {
             console.log(`Transition from ${this.prev} -> ${this.next}`);
         }
-    };
+    }
     let machine = new LoggingSM(States).reset('off');
     expect(console.log).toHaveBeenCalledWith('Transition from off -> on');
     machine.step();

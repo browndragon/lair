@@ -21,7 +21,7 @@ export default class Managed extends States {
     /** Why you're here. Provides elapsed time/delta (relative to our timescale + parent timescale).
      * You can call `_complete` during your `update` implementation if you're done. This is the same as calling `stop` from outside.
      */
-    update(elapsed, delta) {}
+    update(_elapsed, _delta) {}
     
     /** Intended for internal use; turns off a running Managed from inside an update method. */
     _complete() {

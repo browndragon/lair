@@ -20,7 +20,7 @@ class MSM extends SM {
         );
     }
     after() {}
-};
+}
 
 class States extends Phaser.Events.EventEmitter {
     constructor(parent) {
@@ -129,11 +129,11 @@ class States extends Phaser.Events.EventEmitter {
         }
     }
     /** Terminal state handling. */
-    COMPLETE(sm, verb) {
+    COMPLETE(sm, _verb) {
         return sm.transition(null);
     }
     /** (semi-)Terminal state handling. */
-    REMOVED(sm, verb) {
+    REMOVED(sm, _verb) {
         sm.managed.removeAllListeners();
         return sm.transition('COMPLETE');
     }

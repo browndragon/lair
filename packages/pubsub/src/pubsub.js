@@ -3,8 +3,8 @@ import {Table} from '@browndragon/collections';
 export const DELETING = Symbol('Deleting');
 
 export const NilSubscriber = {
-    receive(topic, message) {},
-    unsubscribe(topic) {},
+    receive(_topic, _message) {},
+    unsubscribe(_topic) {},
 };
 
 /**

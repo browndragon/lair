@@ -1,5 +1,3 @@
-import bs from 'binary-search';
-
 /**
  * Makes a datastructure which is es6-like (Set, Map) a "restricting" one, whose iteration methods can be restricted to a "span" on its keylike elements:
  *  * keys for a Map
@@ -30,7 +28,7 @@ export function Restricting(clazz) {
         }
         // Set doesn't have `keys` or we'd override that here too.
         *values(span) {
-            for (let [k, v] of this.entries(span)) {
+            for (let [_k, v] of this.entries(span)) {
                 yield v;
             }
         }

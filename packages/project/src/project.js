@@ -34,7 +34,7 @@ class Project extends Callable {
         // When the template is an iterable, return a new iterable recursing.
         // This feels VERY hard to work with! Consider f() instead...
         let result = [];
-        for (i = 0; i < t.length; ++i) {
+        for (let i = 0; i < t.length; ++i) {
             const res = this(t[i], o[i]);
             result.push(res == undefined ? undefined : res);
         }

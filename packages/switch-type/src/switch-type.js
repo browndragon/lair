@@ -41,6 +41,7 @@ class SwitchType extends Callable {
                             return cb.call(cbs, obj, ...params);
                         }
                     }
+                    break;
                 }
                 case 'object': {
                     if (obj == null) {
@@ -76,7 +77,7 @@ class SwitchType extends Callable {
      * a difficult time separating out subtypes of these for special handling.
      */
     addHandlers(...handlers) {
-        for (handler of handlers) {
+        for (let handler of handlers) {
             this.handlers.push(handler);
         }
         return this;
@@ -93,7 +94,7 @@ class SwitchType extends Callable {
         for (let handler of this.handlers) {
             let methods = handler(obj, cbs);
             if (!methods) { continue }
-            for (let cb of handler(obj, cbs)) {
+            for (let cb of methods) {
                 if (!cb) { continue }
                 return cb.call(cbs, obj, ...params);
             }

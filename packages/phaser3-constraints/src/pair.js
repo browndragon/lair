@@ -1,12 +1,13 @@
 // import Phaser from 'phaser';
 import P3P from '@browndragon/phaser3-plugin';
-import {PointMass} from './force';
+import Anchor from './anchor';
 
 /** Constrains two bodies A & B by modeling them as point masses connected by the given force. */
 export default class Pair extends P3P.Managed {
     constructor(parent, a, b, force) {
-        this.a = PointMass.ensure(a);
-        this.b = PointMass.ensure(b);
+        super(parent);
+        this.a = Anchor.ensure(a);
+        this.b = Anchor.ensure(b);
         this.force = force;
         this.lastA = undefined;
         this.lastB = undefined;
@@ -16,11 +17,11 @@ export default class Pair extends P3P.Managed {
         const a = this.a.object;
         const b = this.b.object;
         if (this.lastA) {
-            a.object.body.acceleration.subtract(this.lastA);
+            a.body.acceleration.subtract(this.lastA);
             this.lastA = undefined;
         }
         if (this.lastB) {
-            b.object.body.acceleration.subtract(this.lastB);
+            b.body.acceleration.subtract(this.lastB);
             this.lastB = undefined;
         }
 

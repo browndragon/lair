@@ -11,9 +11,9 @@ export default class ClassTree {
     }
     add(clazz) {
         let node = this.root();
-        let parent = node;
+        let _parent = node;
         for (let proto of _prototypeChain(clazz.prototype, this.rootClass.prototype)) {
-            parent = node;
+            _parent = node;
             let next = node.get(proto);
             if (next == undefined) {
                 node.set(proto, next = new Map());
@@ -24,27 +24,26 @@ export default class ClassTree {
     visit(cb) {
         _visit(this.root, cb);
     }
-    call(instance) {
+    call(_instance) {
         // TODO: Continue development.
         throw 'unimplemented';
     }
 }
 function _prototypeChain(clazzPrototype, rootClassPrototype) {
     let chain = [];
-    while(true) {
-        if (clazz == undefined) {
-            return chain;
+    for (;;) {
+        if (clazzPrototype == undefined) {
+            return chain.reverse();
         }
-        chain.push(clazz);
+        chain.push(clazzPrototype);
         if (clazzPrototype == rootClassPrototype) {
-            return chain;
+            return chain.reverse();
         }
-        if (clazz == Object.prototype) {
+        if (clazzPrototype == Object.prototype) {
             throw new TypeError(`Never encountered root class ${rootClassPrototype}`);
         }
-        clazz = Object.getPrototypeOf(clazz);
+        clazzPrototype = Object.getPrototypeOf(clazzPrototype);
     }
-    return chain.reverse();
 }
 function _visit(clazzPrototypeMap, cb) {
     for (let [clazzPrototype, children] of clazzPrototypeMap) {

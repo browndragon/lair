@@ -21,9 +21,9 @@ export default class SM {
     }
 
     // Convenience accessor; I kept typing this.
-    get from() { return prev }
+    get from() { return this.prev }
     // Convenience accessor; the semantics of "which state are you in right now" are kind of silly.
-    get current() { return prev }
+    get current() { return this.prev }
 
     // Externally transition into the given state (such as on startup).
     // This sets the next transition & its params, then executes the step.
@@ -39,7 +39,9 @@ export default class SM {
     // Returns this object.
     step(...params) {
         this.params = params;
-        while (this._increment() && this.prev != this.next) {}
+        while (this._increment() && this.prev != this.next) {
+            // The incrementation & execution occurs during _increment.
+        }
         // Once we quiesce, the next time we enter a state will be because of a
         // new call to `step`, so clear out the params to avoid confusion.
         this.params = undefined;

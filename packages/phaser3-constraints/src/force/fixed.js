@@ -11,7 +11,7 @@ export default class Fixed extends Force {
         return `Fixed(${this.value})`;
     }
     /** By convention, the force on object A. */
-    force(pma, pmb) {
+    force(_pma, _pmb) {
         return this.value.clone();
     }
 }

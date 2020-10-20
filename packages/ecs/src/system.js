@@ -19,7 +19,7 @@ export default class System {
     test(entity) { return entity }
 
     /** Called in response to registry update with an instance of `Context` below. */
-    update(...params) {}
+    update(..._params) {}
 }
 
 /** Interface class for use during `update` method. */
@@ -32,7 +32,7 @@ export class Context {
     get removed() { throw 'unimplemented' }
 
     /** Causes this entity to be reobserved by all systems. */
-    observe(entity) { throw 'unimplemented' }
+    observe(_entity) { throw 'unimplemented' }
     /** Causes this entity to be removed from all systems. */
-    remove(entity) { throw 'unimplemented' }
+    remove(_entity) { throw 'unimplemented' }
 }

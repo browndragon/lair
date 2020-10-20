@@ -76,8 +76,8 @@ export default class MultiMap extends Set {
         }
         return vkvs.values();
     }
-    forEach(cb, thisArg, k) {
-        for (let [k, v] of this.entries(k)) {
+    forEach(cb, thisArg, key) {
+        for (let [k, v] of this.entries(key)) {
             cb.call(thisArg, v, k, this);
         }
     }

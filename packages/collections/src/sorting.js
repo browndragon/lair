@@ -54,8 +54,8 @@ export default function Sorting(clazz) {
         makeDirty() {
             this[E] = undefined;
         }
-        preSort(entries) {}
-        postSort(entries) {}
+        preSort(_entries) {}
+        postSort(_entries) {}
         entries(start, end) {
             if (!this[E]) {
                 this[E] = Array.from(super.entries());
@@ -72,7 +72,7 @@ export default function Sorting(clazz) {
         }
         // Set doesn't have `keys` or we'd override that here too.
         *values(start, end) {
-            for (let [k, v] of this.entries(start, end)) {
+            for (let [_k, v] of this.entries(start, end)) {
                 yield v;
             }
         }

@@ -42,7 +42,7 @@ export default class Span {
         return x < this.begin;
     }
     toString() {
-        return `[${begin}, ${end})`;
+        return `[${this.begin}, ${this.end})`;
     }
 }
 const B = Symbol('begin');

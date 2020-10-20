@@ -1,5 +1,4 @@
 import destructure from '@browndragon/func';
-import EmptyIter from './emptyIter';
 
 /**
  * An n-map is an es6 Map whose keys are arrays of n elements, treating `[1] == [1]` (which Map does not do, since they're not the same object).
@@ -9,7 +8,7 @@ import EmptyIter from './emptyIter';
 export default class NMap extends Map {
     constructor(iterable, ...DimensionalMapTypes) {
         super();
-        if (iterable instanceof NTable) {
+        if (iterable instanceof NMap) {
             this[M] = iterable[M];
         } else {
             this[M] = DimensionalMapTypes;
@@ -39,7 +38,7 @@ export default class NMap extends Map {
         }
         let realKs = d.get(ks[this[M].length - 1]);
         if (realKs == undefined) {
-            if (insert) {
+            if (inserting) {
                 d.set(ks[this[M].length - 1], realKs = ks);
             }
             return realKs;
@@ -109,7 +108,7 @@ export default class NMap extends Map {
      * Spans, if given (and supported by the inner types!) restricts the returned entries.
      */
     *values(...spans) {
-        for (let [ks, v] of this.entries(...spans)) {
+        for (let [_ks, v] of this.entries(...spans)) {
             yield v;
         }
     }

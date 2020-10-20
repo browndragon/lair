@@ -1,5 +1,3 @@
-import Managed from './managed';
-
 /**
  * An object which can be put into a manager (like a managed) but which can be a parent of managed objects (like a manager).
  */
@@ -28,8 +26,8 @@ export default function Parent(clazz) {
         }
 
         /** IMPLEMENTME! Creates a new instance of Managed child of this. */
-        create(config) {
-            // return new MyManagedType(this, config);
+        create(_config) {
+            // return new MyManagedType(this, _config);
             throw 'IMPLEMENTME!';
         }
         /** Creates & adds a new managed, following config. */

@@ -8,4 +8,4 @@ export default class Container extends Parent(Managed) {
         this._updateChildren(delta);
         return true;
     }
-};
+}

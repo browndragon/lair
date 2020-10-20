@@ -1,8 +1,8 @@
-import Phaser from 'phaser';
+import _Phaser from 'phaser';
 import { describe, test, expect } from '@jest/globals';
 
-import PointMass from './pointMass';
 import Spring from './spring';
+import Anchor from '../anchor';
 
 describe('Spring forces', () => {
     test.each([
@@ -18,7 +18,7 @@ describe('Spring forces', () => {
             `{"x":-0.09000000000000001,"y":0}`
         ],
     ])('%# Spring(%p, %p, %p)=%p', (spring, a, b, e) => {
-        const result = spring.force(new PointMass(a), new PointMass(b));
+        const result = spring.force(new Anchor(a), new Anchor(b));
         expect(result).toBeInstanceOf(Phaser.Math.Vector2);
         // There's some weird behavior around jest matchers & `-0`, so this
         // bypasses that (... and double precision arithmetic...).

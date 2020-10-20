@@ -55,7 +55,7 @@ export default class Table extends Set {
         return super.delete(s1);
     }
 
-    [DeleteLine](primary, pkey, secondary, callback=undefined) {
+    [DeleteLine](primary, pkey, secondary, cb=undefined) {
         let line = primary.get(pkey);
         if (!line) {
             return 0;
