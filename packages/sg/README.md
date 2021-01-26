@@ -1,4 +1,4 @@
-# `@browndragon/sg`
+# `@browndragon/sg`: Phaser3 SingletonGroups
 
 More formal support for phaser3 groups and subclassed game objects.
 
@@ -18,13 +18,13 @@ In normal phaser code, this would be a lot of code in your `Scene.create()` to a
 import Phaser from 'phaser';
 import SG from '@browndragon/sg';
 
-// Base class & Club for player & enemy sprites.
+// Base class & SingletonGroup for player & enemy sprites.
 class Mob extends SG.Member(
     Phaser.GameObjects.Sprite,
     class extends SG.PGroup {
-        static get collides() { return [this] }  // Self collision: causes Mobs to bounce off of each other. Since Player and Enemy subclass Mob and include parent clubs in their clubs, Enemies are in the Mob club, and so bounce off of each other (and players against players, and players and enemies off of each other).
+        static get collides() { return [this] }  // Self collision: causes Mobs to bounce off of each other. Since Player and Enemy subclass Mob and include parent's singletongroups in their own, Enemies are in the Mob SG, and so bounce off of each other (and players against players, and players and enemies off of each other).
         // There is no need to define `collide(self, other)` because all we want to do is physics exclusion. If we wanted to have colliding with someone on the opposite faction hurt you, we could easily do that with `collide(self, other) { if (self.prototype != other.prototype) { self.getHurt(); other.getHurt(); } }` or similar.
-        // Note that Mob.lastClub (`this`!) is referenced in Bullet, which collides with it.
+        // Note that Mob.LastGroup (`==this`!) is referenced in Bullet, which collides with it.
     },
 ) {
     getHurt() { /* ... */ }  // Play a hurt animation and deduct health, destroying if dead.
@@ -33,19 +33,19 @@ class Mob extends SG.Member(
 
 // Collectable coin pickups.
 class Coin extends SG.Member(
-    Phaser.GameObjects.PGroup,
+    Phaser.GameObjects.Image,
     class extends SG.PGroup {
-        static get overlaps() { return [Coin.Collectors] }  // Run an overlap test with the CoinCollectors.group.
+        static get overlaps() { return [Coin.Collectors] }  // Run an overlap test with the `CoinCollectors.group(...)`.
         overlap(coin, collector) {  // And when they overlap, give the collector points and destroy the coin.
-            coin.getCollected();
             collector.getScore(coin.value);
+            coin.getCollected();
         }
     },
 ) { 
     constructor(scene, x, y, value) { /* ... */ }  // Hardcode image; value determines penny/nickel/dime/quarter.
     getCollected() { /* ... */ }  // Play a chime, animate away, then `this.destroy()`.
 }
-Coin.Collectors = class extends Clubs.Club {}  // Nothing in here, just used for later reference the Club.
+Coin.Collectors = class extends SG.PGroup {}  // Nothing in here; the Coin's anonymous singleton group collides with it, and Player is a member -- this just avoids any circularity of reference, and would let other things collect groups too if you wanted.
 
 // Human-controlled sprite.
 class Player extends Member(Mob, Coin.Collectors) {
@@ -65,7 +65,7 @@ class Enemy extends Mob {
 class Bullet extends SG.Member(
     Phaser.GameObjects.Image,
     class extends SG.PGroup {
-        static get overlaps() { return [Mob.LastClub] }  // Collide with the anonymous club created at Mob,
+        static get overlaps() { return [Mob.LastGroup] }  // Collide with the anonymous singletongroup created at Mob.
         overlap(bullet, victim) {
             victim.getHurt();
             bullet.destroy();
@@ -113,7 +113,7 @@ class Box extends Phaser.GameObjects.Rectangle {
 class Probe extends SG.Member(
     Phaser.GameObjects.Image, 
     class extends SG.PGroup {
-        overlaps() { return [this] }  // All probes can intersect. Could add other clubs based on what we're probing for; maybe they probe for Ground or something?
+        overlaps() { return [this] }  // All probes can intersect. Could add other SGs based on what we're probing for; maybe they probe for Ground or something?
         overlap(aProbe, bProbe) { /* ... */ }  // Do something to the probes or the boxes they're attached to.
     },
 ) {

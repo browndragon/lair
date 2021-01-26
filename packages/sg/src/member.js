@@ -3,7 +3,7 @@ import induct from './induct';
 export default function Member(clazz, ...sgs) {
     if (!clazz[TargetGroups]) {
         clazz = class extends clazz {
-            /** Convenience method for the last group on the Member. */
+            /** Convenience method for the last group's class defined on the Member. */
             static get LastGroup() { return this[TargetGroups][this[TargetGroups].length - 1] }
             addedToScene() {
                 super.addedToScene();
