@@ -1,7 +1,7 @@
 {
   "name": "@browndragon/aspects",
   "private": true,
-  "version": "0.0.11",
+  "version": "0.0.12",
   "description": "Aspects (especially intended for use with phaser.io)",
   "author": "Brown Dragon <browndragon@googlegroups.com>",
   "homepage": "https://github.com/browndragon/lair#readme",
@@ -27,6 +27,6 @@
     "url": "https://github.com/browndragon/lair/issues"
   },
   "dependencies": {
-    "@browndragon/collections": "^0.0.11"
+    "@browndragon/collections": "^0.0.12"
   }
 }

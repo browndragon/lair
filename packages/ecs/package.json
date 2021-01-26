@@ -1,6 +1,6 @@
 {
   "name": "@browndragon/ecs",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "description": "An entity-component-system (intended for phaser but this contains no game logic)",
   "author": "Brown Dragon <browndragon@googlegroups.com>",
   "homepage": "https://github.com/browndragon/lair#readme",
@@ -25,6 +25,6 @@
     "url": "https://github.com/browndragon/lair/issues"
   },
   "dependencies": {
-    "@browndragon/collections": "^0.0.11"
+    "@browndragon/collections": "^0.0.12"
   }
 }
