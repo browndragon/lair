@@ -3,10 +3,11 @@ export default class GameOver extends Phaser.Scene {
     constructor() {
         super({key: 'GameOver'});
     }
-    create({time=0, overrun=false}={}) {
+    create({overrun=false}={}) {
         let salutation = overrun ? 'Terrifying' : 'Good';
         let points = this.sys.registry.values.score;
         let gates = this.sys.registry.values.gates;
+        let time = this.sys.registry.values.playtime;
         let score = points <= 0
             ? 'none!'
             : points == 1

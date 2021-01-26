@@ -12,8 +12,11 @@ export default class Game extends Phaser.Scene {
             physics: { arcade: { } },
         });
     }
+    get nowOverall() {
+        return this.now + this.sys.registry.values.playtime;
+    }
     reinitializeData() {
-        const gates=0, score=0, lives=1.75, shots=0, alive=0, killed=0, alltime=0;
+        const gates=0, score=0, lives=1.75, shots=0, alive=0, killed=0, alltime=0, playtime=0;
         this.sys.registry.set('gates', gates);
         this.sys.registry.set('score', score);
 
@@ -26,6 +29,7 @@ export default class Game extends Phaser.Scene {
         this.sys.registry.set('alive', alive);
         this.sys.registry.set('killed', killed);
         this.sys.registry.set('alltime', alltime);
+        this.sys.registry.set('playtime', playtime);
     }
 
     create({fromGate=false}={}) {
@@ -52,15 +56,9 @@ export default class Game extends Phaser.Scene {
         );
         player.powerUp();
 
-        this.sys.registry.events.on('changedata-lives', (_, v) => {
-            if (v <= 0) {
-                this.scene.stop();
-                this.scene.start('GameOver', {time:this.now});
-            }
-        }, this);
-        this.sys.registry.events.on('changedata-killed', (_, v) => {
-            this.spawn();
-        }, this);
+        console.log('game subscribe', this);
+        this.sys.registry.events.on('changedata-lives', this.lives, this);
+        this.sys.registry.events.on('changedata-killed', this.killed, this);
 
         this.timeEvent = this.time.addEvent({
             startAt: 1250,
@@ -72,10 +70,20 @@ export default class Game extends Phaser.Scene {
         this.events.once('shutdown', () => {
             console.log('game shutdown');
             this.scene.stop('UI');
-            this.sys.registry.events.off('changedata-lives', undefined, this);
-            this.sys.registry.events.off('changedata-killed', undefined, this);
+            this.sys.registry.events.off('changedata-lives', this.lives, this);
+            this.sys.registry.events.off('changedata-killed', this.killed, this);
+            this.sys.registry.inc('playtime', this.now);
             this.time.removeEvent(this.timeEvent);
         });
+    }
+    lives(_, v) {
+        if (v <= 0) {
+            this.scene.stop();
+            this.scene.start('GameOver', {});
+        }
+    }
+    killed(_, v) {
+        this.spawn();        
     }
     touchGate() {
         this.scene.restart({fromGate:true});
@@ -99,7 +107,7 @@ export default class Game extends Phaser.Scene {
         let needs = target - outstanding;
         for (let i = 0; i < Math.min(gates, needs); ++i) {
             if (this.sys.registry.values.alive > 250) {
-                this.scene.start('GameOver', { time:this.now, overrun:true });
+                this.scene.start('GameOver', { overrun:true });
             }
             this.add.existing(new Enemy(
                 this,
