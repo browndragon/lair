@@ -6,7 +6,7 @@ import Pair from './pair';
 /**
  * Constraints 0-4 bodies by a fixed corner for each, maintaining orientation.
  *
- * Hint: This can be used to hold bodies together in a grid pattern.
+ * Hint: This can be used to hold bodies together in a soft-constrained grid pattern.
  */
 export default class Corner extends P3P.Container {
     /** `center` is the center of the bond, which is the corner of each tile. */

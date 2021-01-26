@@ -8,6 +8,7 @@
     "babel-jest": "^26.3.0",
     "babel-loader": "^8.1.0",
     "clean-webpack-plugin": "^3.0.0",
+    "dragonbones": "../DragonBonesJS/Phaser/3.x",
     "embedme": "^1.22.0",
     "eslint": "^7.11.0",
     "file-loader": "^4.2.0",
@@ -16,7 +17,7 @@
     "jest-canvas-mock": "^2.2.0",
     "jest-environment-node": "^26.3.0",
     "lerna": "^3.22.1",
-    "phaser": "^3.24.1",
+    "phaser": "file:../phaser",
     "raw-loader": "^3.1.0",
     "terser-webpack-plugin": "^2.2.1",
     "webpack": "^4.41.2",
@@ -28,12 +29,14 @@
   "scripts": {
     "build:embedme": "lerna exec embedme README.md",
     "build:babel": "lerna exec --parallel -- babel --root-mode upward src -d lib --ignore **/*.spec.js,**/*.test.js",
+    "build:sg": "cd ./packages/sg/__tests__ && webpack --config ../../../webpack/prod.cjs",
     "build": "npm run build:embedme && npm run build:babel",
     "test": "jest",
     "test:debug": "node --inspect-brk node_modules/.bin/jest --runInBand",
     "start:phaser3-constraints": "cd ./packages/phaser3-constraints/examples && webpack-dev-server --config ../../../webpack/base.cjs --open",
     "start:phaser3-ecs": "cd ./packages/phaser3-ecs/examples && webpack-dev-server --config ../../../webpack/base.cjs --open",
     "start:phaser3-plugin": "cd ./packages/phaser3-plugin/examples && webpack-dev-server --config ../../../webpack/base.cjs --open",
+    "start:sg": "cd ./packages/sg/__tests__ && webpack-dev-server --config ../../../webpack/base.cjs --open",
     "lint": "lerna exec eslint src/**/*.js"
   },
   "jest": {
@@ -78,6 +81,7 @@
     "@browndragon/phaser3-ecs": "file:packages/phaser3-ecs",
     "@browndragon/phaser3-plugin": "file:packages/phaser3-plugin",
     "@browndragon/project": "file:packages/project",
-    "@browndragon/sm": "file:packages/phaser3-plugin"
+    "@browndragon/sg": "file:packages/sg",
+    "@browndragon/sm": "file:packages/sm"
   }
 }

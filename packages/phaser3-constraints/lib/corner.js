@@ -18,7 +18,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 /**
  * Constraints 0-4 bodies by a fixed corner for each, maintaining orientation.
  *
- * Hint: This can be used to hold bodies together in a grid pattern.
+ * Hint: This can be used to hold bodies together in a soft-constrained grid pattern.
  */
 class Corner extends _phaser3Plugin.default.Container {
   /** `center` is the center of the bond, which is the corner of each tile. */
