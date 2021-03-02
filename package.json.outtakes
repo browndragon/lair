@@ -1,0 +1,3 @@
+     "start:phaser3-constraints": "cd ./packages/phaser3-constraints/examples && webpack-dev-server --config ../../../webpack/base.cjs --open",
+     "start:phaser3-ecs": "cd ./packages/phaser3-ecs/examples && webpack-dev-server --config ../../../webpack/base.cjs --open",
+     "start:phaser3-plugin": "cd ./packages/phaser3-plugin/examples && webpack-dev-server --config ../../../webpack/base.cjs --open"

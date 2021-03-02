@@ -1,44 +1,43 @@
 import { jest, test, expect } from '@jest/globals';
-import SM from './sm';  // '@browndragon/sm'; <-- this is a unit test so I can't write that!
+import Cursor from './cursor';  // '@browndragon/sm'; <-- this is a unit test so I can't write that!
 
 const States = {
-    ramp(sm, dir) {
-        console.log(`Powering ${dir}`);
-        return sm.transition(dir, true);
+    ramp() {
+        this.power += this.increment;
+        if (this.power >= 3) { return States.on }
+        if (this.power <= 0) { return States.off }
+        return this.value;
     },
-    on(sm, ramped) {
-        if (ramped) {
-            console.log('on');
-            return false;
-        }
-        return sm.transition('ramp', 'off');
+    on() {
+        this.increment = -1;
+        return States.ramp;
     },
-    off(sm, ramped) {
-        if (ramped) {
-            console.log('off');
-            return false;
-        }
-        return sm.transition('ramp', 'on');
+    off() {
+        this.power = 0;
+        this.increment = +1;
+        return States.ramp;
     }
 };
 
 test('Ramp', () => {
-    console.log = jest.fn();
-    let machine = new SM(States).reset('off', true);
-    machine.step();
-    expect(machine.prev).toEqual('on');
-    machine.step();
-    expect(machine.prev).toEqual('off');
-    machine.step();
-    expect(machine.prev).toEqual('on');
+    let machine = new Cursor(States.off);
 
-    expect(console.log).toHaveBeenCalledTimes(7);
-    expect(console.log).toHaveBeenNthCalledWith(1, 'off');
-    expect(console.log).toHaveBeenNthCalledWith(2, 'Powering on');
-    expect(console.log).toHaveBeenNthCalledWith(3, 'on');
-    expect(console.log).toHaveBeenNthCalledWith(4, 'Powering off');
-    expect(console.log).toHaveBeenNthCalledWith(5, 'off');
-    expect(console.log).toHaveBeenNthCalledWith(6, 'Powering on');
-    expect(console.log).toHaveBeenNthCalledWith(7, 'on');
+    expect(machine.value).toEqual(States.off);
+    machine.next();
+    expect(machine.value).toEqual(States.ramp);
+    machine.next();
+    expect(machine.value).toEqual(States.ramp);
+    machine.next();
+    expect(machine.value).toEqual(States.ramp);
+    machine.next();
+    expect(machine.value).toEqual(States.on);
+    machine.next();
+    expect(machine.value).toEqual(States.ramp);
+    machine.next();
+    expect(machine.value).toEqual(States.ramp);
+    machine.next();
+    expect(machine.value).toEqual(States.ramp);
+    machine.next();
+    expect(machine.value).toEqual(States.off);
 });
 

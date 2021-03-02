@@ -1,43 +1,56 @@
 import { jest, test, expect } from '@jest/globals';
-import SM from './sm';  // '@browndragon/sm'; <-- this is a unit test so I can't write that!
+import Cursor from './cursor';  // '@browndragon/sm'; <-- this is a unit test so I can't write that!
+import Machine from './machine';
 
 export const States = {
-    on(sm) {sm.transition('off')},
-    off(sm) {sm.transition('on')},
+    on() { return States.off },
+    off() { return States.on },
 };
 
-test('OnOffSimple', () => {
-    let machine = new SM(States).reset('off');
-    expect(machine.prev).toEqual('off');
+test('OnOffCursor', () => {
+    let machine = new Cursor(States.on);
+    expect(machine.value).toEqual(States.on);
 
-    machine.step();
-    expect(machine.prev).toEqual('on');
-    machine.step();
-    expect(machine.prev).toEqual('off');
+    machine.next();
+    expect(machine.value).toEqual(States.off);
+
+    machine.next();
+    expect(machine.value).toEqual(States.on);
+
+    machine.next();
+    expect(machine.value).toEqual(States.off);
 });
 
-test('OnOffOverridesBefore', () => {
-    console.log = jest.fn();
-    class LoggingSM extends SM {
-        before() {
-            console.log(`Transition into ${this.prev} -> ${this.next}`);
-        }
-    }
-    let machine = new LoggingSM(States).reset('off');
-    expect(console.log).toHaveBeenCalledWith('Transition into undefined -> off');
-    machine.step();
-    expect(console.log).toHaveBeenCalledWith('Transition into off -> on');
+test('OnOffEnterExit', () => {
+    let machine = new Machine(States.off);
+    let log = [];
+    machine.wrap = jest.fn(function(...params) {
+        log.push('before', this.prev, this.value);
+        let state = this.value.apply(this, params);
+        log.push('after', this.value, state);
+        return state;
+    });
+
+    machine.next();
+    expect(machine.wrap).toHaveBeenCalledWith();
+    expect(log).toEqual([
+        'before', undefined, States.off,
+        'after', States.off, States.on,
+    ]);
+    expect(machine.value).toEqual(States.on);
 });
 
-test('OnOffOverridesAfter', () => {
-    console.log = jest.fn();
-    class LoggingSM extends SM {
-        after() {
-            console.log(`Transition from ${this.prev} -> ${this.next}`);
-        }
-    }
-    let machine = new LoggingSM(States).reset('off');
-    expect(console.log).toHaveBeenCalledWith('Transition from off -> on');
-    machine.step();
-    expect(console.log).toHaveBeenCalledWith('Transition from on -> off');
+test('OnOffExitRedirect', () => {
+    let machine = new Machine(States.off);
+    // Jam whenever we attempt to transition.
+    machine.stuckCount = 0;
+    machine.wrap = jest.fn(function wrapped(...params) {
+        this.stuckCount++;
+        return States.off;
+    });
+
+    machine.next();
+    expect(machine.wrap).toHaveBeenCalledWith();
+    expect(machine.stuckCount).toEqual(1);
+    expect(machine.value).toEqual(States.off);
 });

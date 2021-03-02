@@ -29,7 +29,7 @@ Well, you still can't write that, but you can write:
 ```js
 function recursivelySet(object, ...pathKeyValue) {
     let [path, key, value] = destructure(pathKeyValue, 2);
-    // Same bpdy as before.
+    // Same body as before.
 }
 ```
 The default number of right parameters is 1, so if you're just popping one element you don't need to pass anything (`const [path, last] = destructure(pathAndLast)`). You can also destructure some left hand parameters at the same time for potential efficiency gains: `const [first, middleArray, last] = destructure(array, 1, 1)`.

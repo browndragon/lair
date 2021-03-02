@@ -1,0 +1,30 @@
+{
+  "name": "@browndragon/tag",
+  "version": "0.0.13",
+  "description": "Utilities for working with es6 tagged templates",
+  "keywords": [
+    "tag"
+  ],
+  "author": "Brown Dragon <browndragon@googlegroups.com>",
+  "homepage": "https://github.com/browndragon/lair#readme",
+  "license": "MIT",
+  "main": "lib/index.js",
+  "module": "src/index.js",
+  "files": [
+    "lib/*",
+    "!/**/*.test.js"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/browndragon/lair.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  },
+  "bugs": {
+    "url": "https://github.com/browndragon/lair/issues"
+  }
+}

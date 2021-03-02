@@ -4,147 +4,169 @@ A tiny little state machine driver.
 
 ## States
 
-A set of states is an object made of methods that take the state machine instance and potentially additional parameters, like:
+A set of states is an object made of methods that expect to be called with `this` being a state machine, and one or more parameters:
 ```js
-// src/onoff.test.js#L4-L7
+// src/onoff.test.js#L5-L8
+
 
 export const States = {
-    on(sm) {sm.transition('off')},
-    off(sm) {sm.transition('on')},
-};
+    on() { return States.off },
+    off() { return States.on },
 ```
 
-You can use an es6 class based object too, of course; the only thing that's important is that you be able to return the names of your methods.
+You could also use something like `import * as States from './states'` for a file that had `export function on() {...}` etc.
+Each method is a `state`; a `state` is a function which returns other functions.
 
-Each method is a `state`; a `state` is a function whose first parameter is a state machine instance.
-
-> Tip: If you're concerned about minification, you can always use `Symbol`s, since then you can guarantee what-you-return is what-you-see.
+For concenvience, the cursor (and its slightly more souped up cousin Machine) are both javascript iterables and iterators. When viewed this way, their `value` is the method they will next run, and they are `done` when `value` is falsey.
 
 ## State machines
 
-This class provides the State Machine implementation, tersely termed `SM`.
+This module provides the State Machine implementation `Machine`.
 
-It has 3 critical methods:
-* Call `reset(state, ...params)` before any other methods, from **outside** of a `state` method: This immediately transitions & steps the state machine into the given state.
-* Call `transition(state, ...params)` from **inside** of a `state` method: to modify the state of this state machine so that it will enter the named state (from the current state). Multiple calls to transition will result only in the latest call being used. If the `state` method returns true, the transition will happen immediately. If the `state` method returns false, the transition will happen **on the next call to `step` with the params provided to transition ignored**. Returns true if the given state is different than the current state.
-* Call `step(...params)` from **outside** of a `state` method: call the current state method with the given params (instead of any given when it transitioned)
+Your primary interaction with the machine is to feed it an event, which you can do with `next(...params)`, this will automatically call the current state (called `value`) in the context of the machine instance with the indicated params. This returns the next state which will be entered as a consequence of seeing this event.
 
-> Tip: If you want to transition into a state and do some work immediately, but then await another external call before doing anything else, you can use a "verb/return false" pattern:
+Its constructor takes only a single parameter: the state to enter on the next call to `next`. You can reset the state so that the next call will enter the state of your choosing with `jump`.
+
+State machines mediate each call to `next` with a call to `this.wrap`. If you define `myStateMachine.wrap`, then that method is responsible for actually invoking 
+
+### Machine.value
+A suitable method for the state machine takes any number of arguments (it's often convenient if it takes no arguments!) and returns another suitable method.
+All state machine methods are invoked in the context of the state machine object itself.
+
+```
+function stateA() { console.log('A called!'); return stateB; }
+function stateB() { console.log('B called!'); return stateA; }
+console.assert((new Cursor(stateA)).next().next().value == stateA);  // A called! // B called! // passes the assert.
+```
+
+#### Machine.done
+Since the machine is defined as an iterator, it's also possible to write:
 ```js
-// src/ramp.test.js#L4-L23
+// src/grog.test.js#L4-L25
+function init() { this.food = 0; this.hunger = 0; this.sleepy = 0; this.happy = 1; }
+function decide() { return this.hunger > 0 ? tryEat : this.sleepy ? doSleep : worry }
+function tryEat() { return this.food > 0 ? doEat : doHunt }
+function doEat() { this.food--; this.hunger--; this.happy++; console.log('Grog eat food!') }
+function doHunt() { this.food++; this.sleepy++; this.happy++; console.log('Grog spend day hunting!') }
+function doSleep() { this.happy++ ; console.log('Grog enjoy nap.') }
+function worry() { this.sleepy++; this.happy-=2; console.log('Grog troubled.') }
 
-const States = {
-    ramp(sm, dir) {
-        console.log(`Powering ${dir}`);
-        return sm.transition(dir, true);
-    },
-    on(sm, ramped) {
-        if (ramped) {
-            console.log('on');
-            return false;
-        }
-        return sm.transition('ramp', 'off');
-    },
-    off(sm, ramped) {
-        if (ramped) {
-            console.log('off');
-            return false;
-        }
-        return sm.transition('ramp', 'on');
-    }
+let m = new Cursor(init);
+m.next();  // Hits undefined *on purpose*.
+console.log(`You are Grog an overactive neanderthal.`);
+while(true) {
+    console.log(`What will we do today?`);
+    m.jump(decide);
+    for (let _ of m) {}    
+    console.log(`Update: food:${m.food} hunger:${m.hunger} sleepy:${m.sleepy} happy:${m.happy}`);
+}
+```
+This is not necessarily useful in the general case (since it forces the operator to frequently use `jump` to restart the state machine), but it's instructive -- that `for(let _ of m){}` line 
+
+### `Machine.wrap`
+Wrap gives you the ability to specialize & redirect handling by *replacing* the call to `this.value` with a call to `this.wrap`. It is on you to ensure the current `value` is invoked, often via:
+
+```js
+let x = new Machine(someFunction);
+x.wrap = function wrap(...params) {
+    // ... preprocessing
+    let retval = this.value.apply(this, params);
+    // ... postprocessing
+    return retval;  // this will be the next `value`.    
 };
 ```
 
+Your machine will transition to whatever `wrap` returns.
+
+> Note: History is maintained before `wrap` is called. This means that if your `machine.value = A` and you call `machine.next()`, `machine.prevs` *will contain* `A` by the time your `machine.wrap` is called. 
+
+### `Machine.prevs`, `.prevCount`, `.prev`
+
+* `prevs` is the set of all states which have previously been started (so the last entry is the currently executed state).
+* `prev` is the state immediately preceding `value`
+* `prevCount` is the map counting the number of times each node appears in `prevs`, so that the first time you enter a node, its value will be 1, and 2 the second time, and so forth.
+
+
 ## Example State Machines
 
-You can make the "OnOff" example above into a state machine and drive it using the SM object and its `reset` method to tell it where to start and its `step` method to make transitions:
+The `Machine.wrap` can be used to handle cross-cutting behaviors:
 ```js
-// src/onoff.test.js#L10-L16
+// src/onoff.test.js#L24-L41
 
-let machine = new SM(States).reset('off');
-expect(machine.prev).toEqual('off');
+    expect(machine.value).toEqual(States.off);
+});
 
-machine.step();
-expect(machine.prev).toEqual('on');
-machine.step();
-expect(machine.prev).toEqual('off');
-```
-`SM`'s `before` and `after` can be overridden to handle cross-cutting behaviors:
-```js
-// src/onoff.test.js#L21-L29
-
-class LoggingSM extends SM {
-    before() {
-        console.log(`Transition into ${this.prev} -> ${this.next}`);
-    }
-}
-let machine = new LoggingSM(States).reset('off');
-expect(console.log).toHaveBeenCalledWith('Transition into undefined -> off');
-machine.step();
-expect(console.log).toHaveBeenCalledWith('Transition into off -> on');
+test('OnOffEnterExit', () => {
+    let machine = new Machine(States.off);
+    let log = [];
+    machine.wrap = jest.fn(function(...params) {
+        log.push('before', this.prev, this.value);
+        let state = this.value.apply(this, params);
 ```
 
-Alternatively, if there are choices to be made, they can live in the states, for instance:
+A simple machine that makes choices based on system properties:
 ```js
-// src/water.test.js#L6-L19
+// src/water.test.js#L5-L12
 
+```
+which you can use:
+```js
+// src/water.test.js#L15-L21
+
+// water goes through liquid on its way from solid to gas.
+// There's intentionally hysteresis: water at 0 is a solid if it was a solid, liquid if it was a liquid.
 export const Water = {
-    solid(sm, degC) {
-        if (degC > 0) { return sm.transition('liquid', degC) }
-        return false;
-    },
-    liquid(sm, degC) {
-        if (degC > 100) { return sm.transition('gas', degC) }
-        if (degC < 0) { return sm.transition('solid', degC) }
-        return false;
-    },
-    gas(sm, degC) {
-        if (degC < 100) { return sm.transition('liquid', degC) }
-        return false;
-    },
-```
-As a dummy to show how to modify state transitions from the state machine (rather than the states themselves); here's an implementation of a "sublimer":
-```js
-class PhaseWatcher extends SM {}  // Not relevant to this example...
-```
-```js
-// src/water.test.js#L57-L69
+    solid(degC) { return degC > 0 ? Water.liquid : this.value },
+    liquid(degC) { return degC > 100 ? Water.gas : degC < 0 ? Water.solid : this.value },
+    gas(degC) { return degC < 100 ? Water.liquid : this.value },
+};
 
-// Bad practice, this should just live in your states. Still, shows the principle that you might want to redirect some or all state transitions, such as for errors or similar.
-class Sublimer extends PhaseWatcher {
-    before() {
-        let [degC, ...rest] = this.params;
-        if (degC < 0 && this.prev == 'gas') {
-            this.transition('solid', degC);
-        }
-        if (degC > 100 && this.prev == 'solid') {
-            this.transition('gas', degC);
-        }
-        super.before([degC, ...rest]);
-    }
-}
+test('SimpleWaterFlow', () => {
+    let machine = new Cursor(Water.liquid);
+    expect(machine.value).toEqual(Water.liquid);
+
+    machine.next(0);
+    expect(machine.value).toEqual(Water.liquid);
+```
+or if you want to get fancy and support sublimation *from outside of the states* -- this is generally a bad idea, but it's being included to show off the technique -- you would:
+```js
+// src/water.test.js#L53-L71
+
+
+var log = [];
+machine.wrap = function wrapped(degC) {
+    let state = (() => {
+        // Patch in support for sublimation
+        if (this.value == Water.solid && degC >= 100) { return Water.gas }
+        if (this.value == Water.gas && degC <= 0) { return Water.solid }
+        return this.value.call(this, degC);
+    })();
+    // Log it.
+    log.push(`${this.value.name}-[${degC}]->${state.name}`);
+    return state;
+};
 ```
 
-You can absolutely use this class with (ahem) stateful states, as well as automated step progression, for instance with object literal:
+Perhaps you instead need some sort of countdown latch behavior:
 ```js
 // src/sozu.test.js#L5-L20
 
 const SozuState = {  // https://en.wikipedia.org/wiki/Shishi-odoshi
-    fullness: 0,
-    capacity: 100,
-    filling(sm, amount) {
+    dumping() {
+        // This doesn't NEED to be implemented here, but it's a reasonable place to go.
+        this.capacity = 100;
+        this.fullness = 0;
+        return SozuState.filling;
+    },
+    filling(amount) {
         expect(Number.isFinite(amount)).toBeTruthy();
         this.fullness += amount;
-        if (this.fullness >= this.capacity) {
-            return sm.transition('dumping');
-        }
+        return this.fullness >= this.capacity ? SozuState.dumping : this.value;
     },
-    dumping(sm) {
-        this.fullness = 0;
-        return sm.transition('filling', 0);
-    },
-    toString() { return `${this.fullness}/${this.capacity}` }
 };
+let machine = new Cursor(SozuState.dumping);
+expect(machine.value).toEqual(SozuState.dumping);
+expect(machine.fullness).toEqual(undefined);
 ```
 This example causes the step which overfills the sozu to automatically transition into the `dumping` state (potentially with side effects), which resets the fullness variable and immediately transitions back into the filling state.
 
