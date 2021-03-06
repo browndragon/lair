@@ -70,6 +70,7 @@
   },
   "dependencies": {
     "@browndragon/callable": "file:packages/callable",
+    "@browndragon/dia": "file:packages/dia",
     "@browndragon/destructure": "file:packages/destructure",
     "@browndragon/sg": "file:packages/sg",
     "@browndragon/sm": "file:packages/sm",
