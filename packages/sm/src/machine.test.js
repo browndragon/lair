@@ -79,19 +79,15 @@ test('SimpleHistory', () => {
     let machine = new Machine(X.a);
     expect(machine.value).toEqual(X.a);
     expect(machine.here).toEqual(X.a);
-    expect(machine.state.comeFrom).toEqual(undefined);
     expect(machine.next().value).toEqual(X.b);
     expect(machine.here).toEqual(X.b);
-    expect(machine.state.comeFrom).toEqual(X.a);
     expect(machine.next().value).toEqual(X.c);
     expect(machine.here).toEqual(X.c);
 
-    expect([...machine.rprevs()]).toEqual([X.c, X.b, X.a]);
-    expect(machine.prevs).toEqual([X.a, X.b, X.c]);
+    expect(machine.prevs).toEqual([X.a, X.b]);
 
-    expect(machine.state.comeFrom).toEqual(X.b);
     expect(machine.next().value).toEqual(undefined);
-    expect(machine.prevs).toEqual([]);
+    expect(machine.prevs).toEqual([X.a, X.b, X.c]);
 });
 
 describe('Interrupts', () => {
@@ -103,7 +99,7 @@ describe('Interrupts', () => {
     test('InterruptsHistory', () => {
         let machine = new Machine(Is.start);
         expect(machine.value).toEqual(Is.start);
-        expect(machine.prevs).toEqual([Is.start]);
+        expect(machine.prevs).toEqual([]);
         expect(machine.getState(Is.start).count).toEqual(0);
         expect(machine.getState(Is.running).count).toEqual(0);
         expect(machine.getState(Is.inline).count).toEqual(0);
@@ -114,6 +110,7 @@ describe('Interrupts', () => {
         expect(machine.prevs).toEqual([
             Is.start,
             Is.running,
+            Is.inline,
         ]);
         expect(machine.getState(Is.start).count).toEqual(1);
         expect(machine.getState(Is.running).count).toEqual(1);
@@ -124,8 +121,11 @@ describe('Interrupts', () => {
         expect(machine.interrupts).toEqual(30 + 21);  // It was set to 0 in ctor and then ++ in the first run of running.
         expect(machine.value).toEqual(Is.running);
         expect(machine.prevs).toEqual([
+            Is.start,
             Is.running,
-            Is.running,  // Cycle detected! We knew this was a risk, its pattern is pretty degenerate.
+            Is.inline,
+            Is.running,
+            Is.inline,
         ]);
         expect(machine.getState(Is.start).count).toEqual(1);
         expect(machine.getState(Is.running).count).toEqual(2);
@@ -191,7 +191,7 @@ test('Goto', () => {
             return X.strand;
         },
         strand() { return X.deadend },
-        deadend() { deadended = true },
+        deadend() { deadended = true },  // Returns undefined!
         recover() {},
     };
     let m = new Machine(X.start);
@@ -265,51 +265,3 @@ test('Goto Escape', () => {
     }
     expect(m.value).toEqual(undefined);
 });
-
-// describe('Resumes', () => {
-//     test('ResumesHistory', () => {
-//         const Ss = {
-//             start() {
-//                 if (this.chosen) { return this.chosen }
-//                 this.trap();
-//                 return Ss.choose;
-//             },
-//             choose(s) { this.chosen = s },
-//             a() {},
-//             b() {},
-//         };
-//         let machine = new Machine(Ss.start);
-//         machine.next();
-//         machine.next(Ss.a);
-//         machine.next();
-//         machine.next();
-//         expect(machine.value).toEqual(undefined);
-//         expect(machine.prevs).toEqual([
-//             Ss.start,
-//             Ss.choose,
-//             Ss.start,
-//             Ss.a,
-//         ]);
-//     });
-//     test('Traps', () => {
-//         const Ss = {
-//             a() {this.trap(0, Ss.b); return Ss.c;},
-//             b() {return Ss.c},
-//             c() {return Ss.d},
-//             d() {}
-//         };
-//         let machine = new Machine(Ss.a);
-//         machine.next();
-//         expect(machine.value).toEqual(Ss.c);
-//         machine.next();
-//         expect(machine.value).toEqual(Ss.d);
-//         machine.next();
-//         expect(machine.value).toEqual(Ss.b);
-//         machine.next();
-//         expect(machine.value).toEqual(Ss.c);
-//         machine.next();
-//         expect(machine.value).toEqual(Ss.d);
-//         machine.next();
-//         expect(machine.value).toEqual(undefined);
-//     });
-// });

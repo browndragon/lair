@@ -12,6 +12,7 @@ export default class Machine extends Cursor {
 
         // Internal storage state for all states seen by this map.
         this.states = new Map();
+        this._trapNodes = new Set();
 
         // Number of explicit calls to next that have occurred.
         this.nextCount = 0;
@@ -23,22 +24,22 @@ export default class Machine extends Cursor {
         // Prevent next from being called reentrantly. If you want that, you want `inline`.
         this._evaluatingNext = false;
         this._jumpTarget = undefined;
+
+        // All evaluated states with 0 being the first one. Set *just* before evaluation.
+        // This has to happen because if just *after* evaluation, inlines do *very* strange things to the invoke order.
+        this._invokes = [];
     }
-    get prev() { return this.state.comeFrom }
-    /** Prevs sorted with 0 being the most recent (including not yet run!), and n the earliest (or first repeat). */
-    *rprevs() {
-        let caller = this.here;
-        let called = new Set();
-        while (caller != undefined) {
-            yield caller;
-            if (called.has(caller)) {
-                break;
-            }
-            called.add(caller);
-            caller = this.getState(caller).comeFrom;
-        }
+    /**
+     * The index of the last invoked state *that is not the currently invoking state* (since that's `this.here`).
+     */
+    get prevIndex() {
+        return this._invokes.length - (this._evaluatingNext ? 2 : 1);
     }
-    get prevs() { return [...this.rprevs()].reverse() }
+    get prev() {
+        return this._invokes[this.prevIndex];
+    }
+    /** The invoke history leading up to `prev`. */
+    get prevs() { return this._invokes.slice(0, this.prevIndex + 1) }
 
     next(...params) {
         console.assert(!this._evaluatingNext);
@@ -52,20 +53,9 @@ export default class Machine extends Cursor {
         } finally {
             this._evaluatingNext = false;
             if (this._jumpTarget) {
-                return this.jump(...this._jumpTarget);
+                return this.jump(this._jumpTarget);
             }
         }
-    }
-
-    inline(next, ...params) {
-        let nextState = this.getState(next);
-        nextState.comeFrom = this.here;
-        nextState.goTo = this.state.goTo;
-        // So what do we do on the way back in if they've jumped?
-        // X->Y[JUMP Z] for instance.
-        // Then here will be Z (not Y) -- but we don't know the caller of inline is done executing; they may even continue to call children.
-        // The sanest thing to do might be to throw an exception (so that it can percolate up the stack back to `next`.
-        return super.inline(next, ...params);            
     }
 
     _invoke(...params) {
@@ -74,44 +64,39 @@ export default class Machine extends Cursor {
         if (!here) {
             return undefined;
         }
-        let state = this.state;
 
         this.invokeCount++;
+        this._invokes.push(here);
+
+        let state = this.state;
         state.count++;
         state.lastInvoke = this.invokeCount;
         state.lastNext = this.nextCount;
 
         let next = super._invoke(...params);
-        let trapped = next === undefined && state.goTo;
-        if (trapped) {
-            next = state.goTo;
-        }
-        if (next) {
-            let nextState = this.getState(next);
-            nextState.comeFrom = here;
-            if (!trapped) {
-                // If it *was* the result of a trap, don't screw with its own recovery path.
-                nextState.goTo = state.goTo;
-            }
-        }
-        return next;
+        let nextState = this.getState(next);
+        // We return the trap state (if any!) for preference -- it's a trap! -- but without a trap, we just return the next state.
+        return nextState.traps.pop() || next;
     }
 
-    jump(someState, comeFrom) {
+    /** Jumps clear the trap state, since they effectively reset the state machine. */
+    jump(someNode) {
         if (this._evaluatingNext) {
-            this._jumpTarget = [someState, comeFrom];
-            return undefined;
+            this._jumpTarget = someNode;
+            return someNode;
         }
-        super.jump(someState);
-        let state = this.state;
-        state.comeFrom = comeFrom;
-        state.goTo = comeFrom && comeFrom.goTo;
+        for (let node of this._trapNodes) {
+            let state = this.getState(node);
+            state.traps = [];
+        }
+        this._trapNodes.clear();
+        super.jump(someNode);
         return this;
     }
 
     /** Exposes mutable state information associated with the current node. */
-    get state() { return this.getState() }
-    getState(target=this.here) {
+    get state() { return this.getState(this.here) }
+    getState(target) {
         let state = this.states.get(target);
         if (!state) {
             this.states.set(target, state = new State());
@@ -130,16 +115,15 @@ export default class Machine extends Cursor {
      * @param [target] - The node whose nest is being populated (implicitly, `here`).
      */
     nest(cb, target=this.here) { return this.getState(target).initNest(cb) }
-    /**
-     * Sets a trap so that any downstream (inline or retval) node which returns undefined (NOT null) will instead return the indicated value.
-     */
-    trap(goTo) {
-        let hereState = this.state;
-        let goToState = this.getState(goTo);
 
-        goToState.goTo = hereState.goTo;
-        hereState.goTo = goTo;
-        return goTo;
+    /**
+     * Sets a trap so that any downstream (inline or retval) node which returns comeFrom (undefined by default) will once go to the goto state. All traps are cleared on jump.
+     */
+    trap(goTo, comeFrom=undefined) {
+        this._trapNodes.add(comeFrom);
+        let comeFromState = this.getState(comeFrom);
+        comeFromState.traps.push(goTo);
+        return this;
     }
 }
 
@@ -160,18 +144,9 @@ class State {
         this.nest = undefined;  // Onetime initialized inner methods made static.
 
         /**
-         * Node immediately preceeding this state.
-         * You can't always reconstruct entire history based on this, since you could have A->X->B->X->C, in which case
-         * we'd have C comefrom X, X comefrom B, B comefrom X, X comefrom !B! -- A is lost.
-         * Jumps can tell lies to goto also.
+         * If this is set, attempts to transition into this state will instead result in clearing the trap and entering the trap state. This is useful/meaningful for undefined or null, but it seems very weird for real states. Maybe sensible for testing or instrumenting or something.
          */
-        this.comeFrom = undefined;
-        /**
-         * A goto "recovery path" set from this node to *all downstream nodes* (retval or inline); set when comefrom is set.
-         * The tainting can be broken by breaking the comefrom chain via `jump` with no comefrom.
-         * It's triggered with the offending node when a node returns undefined (NOT null).
-         */
-        this.goTo = undefined;
+        this.traps = [];
     }
     initOnce(cb) {
         if (this.once === undefined && cb) {
