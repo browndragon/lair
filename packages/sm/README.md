@@ -8,10 +8,10 @@ A set of states is an object made of methods that expect to be called with `this
 ```js
 // src/onoff.test.js#L5-L8
 
-
 export const States = {
     on() { return States.off },
     off() { return States.on },
+};
 ```
 
 You could also use something like `import * as States from './states'` for a file that had `export function on() {...}` etc.
@@ -43,22 +43,28 @@ console.assert((new Cursor(stateA)).next().next().value == stateA);  // A called
 Since the machine is defined as an iterator, it's also possible to write:
 ```js
 // src/grog.test.js#L4-L25
-function init() { this.food = 0; this.hunger = 0; this.sleepy = 0; this.happy = 1; }
-function decide() { return this.hunger > 0 ? tryEat : this.sleepy ? doSleep : worry }
-function tryEat() { return this.food > 0 ? doEat : doHunt }
-function doEat() { this.food--; this.hunger--; this.happy++; console.log('Grog eat food!') }
-function doHunt() { this.food++; this.sleepy++; this.happy++; console.log('Grog spend day hunting!') }
-function doSleep() { this.happy++ ; console.log('Grog enjoy nap.') }
-function worry() { this.sleepy++; this.happy-=2; console.log('Grog troubled.') }
 
-let m = new Cursor(init);
-m.next();  // Hits undefined *on purpose*.
-console.log(`You are Grog an overactive neanderthal.`);
-while(true) {
-    console.log(`What will we do today?`);
-    m.jump(decide);
-    for (let _ of m) {}    
-    console.log(`Update: food:${m.food} hunger:${m.hunger} sleepy:${m.sleepy} happy:${m.happy}`);
+function init() { this.food = 0; this.hungry = 0; this.sleepy = 0; this.happy = 1; }
+function decide() { return this.hungry > 0 ? tryEat : this.sleepy ? doSleep : worry }
+function tryEat() { return this.food > 0 ? doEat : doHunt }
+function doEat() { this.food--; this.hungry--; this.happy++; console.log('Grog eat food!') }
+function doHunt() { this.food++; this.sleepy++; this.happy++; console.log('Grog spend day hunting!') }
+function doSleep() { this.sleepy--; this.happy++ ; console.log('Grog enjoy nap.') }
+function worry() { this.sleepy++; this.hungry++; this.happy-=2; console.log('Grog troubled.') }
+
+
+function grogAdventure() {
+    let m = new Cursor(init);
+    m.next();
+    console.log('You are a neanderthal for ten days.');
+    for (let i = 1; i <= 10; ++i) {
+        console.log(`Dawn of the ${nth(i)} day`);
+        m.jump(decide);
+        for (let _ of m) {}
+        const {food, hungry, sleepy, happy} = m;
+        console.log('Grog is: ', {hungry, sleepy, happy}, 'Grog has: ', {food});
+    }
+    function nth(n) { return n == 1 ? `1st` : n == 2 ? `2nd` : n == 3 ? `3rd` : `${n}th` }
 }
 ```
 This is not necessarily useful in the general case (since it forces the operator to frequently use `jump` to restart the state machine), but it's instructive -- that `for(let _ of m){}` line 
@@ -93,26 +99,31 @@ The `Machine.wrap` can be used to handle cross-cutting behaviors:
 ```js
 // src/onoff.test.js#L24-L41
 
-    expect(machine.value).toEqual(States.off);
-});
-
 test('OnOffEnterExit', () => {
     let machine = new Machine(States.off);
     let log = [];
     machine.wrap = jest.fn(function(...params) {
         log.push('before', this.prev, this.value);
         let state = this.value.apply(this, params);
+        log.push('after', this.value, state);
+        return state;
+    });
+
+    machine.next();
+    expect(machine.wrap).toHaveBeenCalledWith();
+    expect(log).toEqual([
+        'before', undefined, States.off,
+        'after', States.off, States.on,
+    ]);
+    expect(machine.value).toEqual(States.on);
+});
 ```
 
 A simple machine that makes choices based on system properties:
 ```js
 // src/water.test.js#L5-L12
 
-```
-which you can use:
-```js
-// src/water.test.js#L15-L21
-
+// Implements triple phase of water WITHOUT sublimation/deposition, so that
 // water goes through liquid on its way from solid to gas.
 // There's intentionally hysteresis: water at 0 is a solid if it was a solid, liquid if it was a liquid.
 export const Water = {
@@ -120,18 +131,27 @@ export const Water = {
     liquid(degC) { return degC > 100 ? Water.gas : degC < 0 ? Water.solid : this.value },
     gas(degC) { return degC < 100 ? Water.liquid : this.value },
 };
+```
+which you can use:
+```js
+// src/water.test.js#L15-L21
 
-test('SimpleWaterFlow', () => {
-    let machine = new Cursor(Water.liquid);
-    expect(machine.value).toEqual(Water.liquid);
+let machine = new Cursor(Water.liquid);
+expect(machine.value).toEqual(Water.liquid);
 
-    machine.next(0);
-    expect(machine.value).toEqual(Water.liquid);
+machine.next(0);
+expect(machine.value).toEqual(Water.liquid);
+machine.next(-1);
+expect(machine.value).toEqual(Water.solid);
 ```
 or if you want to get fancy and support sublimation *from outside of the states* -- this is generally a bad idea, but it's being included to show off the technique -- you would:
 ```js
 // src/water.test.js#L53-L71
 
+// Insert a pre before every call that automatically makes the state phase based on temperature.
+// Note that this skips the proper phase: if it should have sublimated, this doesn't call solid at all, but merely
+// ensures the state execution of gas directly!
+machine.jump(Water.liquid);
 
 var log = [];
 machine.wrap = function wrapped(degC) {
@@ -145,28 +165,30 @@ machine.wrap = function wrapped(degC) {
     log.push(`${this.value.name}-[${degC}]->${state.name}`);
     return state;
 };
+machine.next(101);
+expect(machine.value).toEqual(Water.gas);
 ```
 
 Perhaps you instead need some sort of countdown latch behavior:
 ```js
 // src/sozu.test.js#L5-L20
 
-const SozuState = {  // https://en.wikipedia.org/wiki/Shishi-odoshi
-    dumping() {
-        // This doesn't NEED to be implemented here, but it's a reasonable place to go.
-        this.capacity = 100;
-        this.fullness = 0;
-        return SozuState.filling;
-    },
-    filling(amount) {
-        expect(Number.isFinite(amount)).toBeTruthy();
-        this.fullness += amount;
-        return this.fullness >= this.capacity ? SozuState.dumping : this.value;
-    },
-};
-let machine = new Cursor(SozuState.dumping);
-expect(machine.value).toEqual(SozuState.dumping);
-expect(machine.fullness).toEqual(undefined);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ```
 This example causes the step which overfills the sozu to automatically transition into the `dumping` state (potentially with side effects), which resets the fullness variable and immediately transitions back into the filling state.
 

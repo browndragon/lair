@@ -6,18 +6,18 @@ Object.defineProperty(exports, "__esModule", {
 Object.defineProperty(exports, "default", {
   enumerable: true,
   get: function () {
-    return _callable.default;
+    return _tag.default;
   }
 });
-Object.defineProperty(exports, "ContextCallable", {
+Object.defineProperty(exports, "isTagExpr", {
   enumerable: true,
   get: function () {
-    return _contextCallable.default;
+    return _isTagExpr.default;
   }
 });
 
-var _callable = _interopRequireDefault(require("./callable"));
+var _tag = _interopRequireDefault(require("./tag"));
 
-var _contextCallable = _interopRequireDefault(require("./contextCallable"));
+var _isTagExpr = _interopRequireDefault(require("./isTagExpr"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }

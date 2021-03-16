@@ -157,7 +157,7 @@ describe('Once', () => {
 
 describe('NestLegible', () => {
     function root() {
-        return this.nest(() => {
+        return this.once(() => {
             const X = {
                 a() { return X.b },
                 b() { return root },
@@ -170,16 +170,17 @@ describe('NestLegible', () => {
         for (let i = 0; i < 10; ++i) { m.next() }
         expect(m.states.size).toEqual(3);        
         expect(m.getState(root).count).toEqual(4);
-        expect(m.getState(m.getState(root).nest.a).count).toEqual(3);
-        expect(m.getState(m.getState(root).nest.b).count).toEqual(3);
+        expect(m.getState(m.getState(root).once.a).count).toEqual(3);
+        expect(m.getState(m.getState(root).once.b).count).toEqual(3);
     });
-    test('brokenNest', () => {
+    test('brokenOnce', () => {
         let m = new Machine(root);
-        m.nest = (cb) => cb();
+        m.once = (cb) => cb();
         for (let i = 0; i < 10; ++i) { m.next() }
         expect(m.states.size).toEqual(8);
         expect(m.getState(root).count).toEqual(4);
-        expect(m.getState(root).nest).toEqual(undefined);
+        // Because we broke the once function:
+        expect(m.getState(root).once).toEqual(null);
     });
 });
 

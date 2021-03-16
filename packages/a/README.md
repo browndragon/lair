@@ -1,6 +1,6 @@
-# `log`
+# `a`
 
-> TODO: description
+Dialog manager using the simple state machine `@browndragon/sm`.
 
 ## Usage
 

@@ -9,31 +9,37 @@ import destructure from '@browndragon/destructure';
  * Additionally, Cursors can be "reset" into any given node via the `jump` operator, which immediately sets their value into the given value. Note that this may cause them to revert done-ness!
  */
 export default class Cursor {
-    constructor(node) {
-        this.value = node;
+    constructor(here) {
         this._done = false;
         /**
          * Matches the signature of `value` -- if set, this is responsible for actually executing on each step!
          * It usually invokes `return this.here.apply(this, params)`, though potentially with some additional setup or teardown.
          */
         this.wrap = undefined;
+        // Reset into the passed-in value.
+        this.here = here;
     }
     /** Note that a cursor with no next node is also considered done. */
-    get done() { return this._done || !this.value }
+    get done() { return this._done || !this.here }
     /** Sets done. While value is undefined, done will still *read* as true. */
     set done(v) { this._done = v }
 
     /** Convenience spelling for the "current value", which is the function the node machine thinks is being executed. */
-    get here() { return this.value }
+    get value() { return this.here }
 
-    /** Resets next to the passed in value. */
-    jump(value) {
-        this.value = value;
+    /**
+     * Resets next to the passed in value, usually called externally.
+     * If called from a node which was invoked via next, you should instead simply *return* `value`.
+     * If called from a node which was invoked via inline, you cannot enforce transition into `value` even *with* a jump; return `value` and ensure all `inline`s back to the `next`ed node return `value` as well.
+     * See Machine for more discussion, which slightly changes semantics.
+     */
+    jump(here) {
+        this.here = here;
         return this;
     }
     /** Progresses the cursor to the next value. */
     next(...params) {
-        this.value = this._invoke(...params);
+        this.here = this._invoke(...params);
         return this;
     }
 
@@ -52,14 +58,15 @@ export default class Cursor {
      */
     inline(next, ...params) {
         if (!next) { return undefined }
-        let current = this.value;
+        let current = this.here;
         try {
-            this.value = next;
+            this.here = next;
             return this._invoke(...params);
-            // Does *not* store the value it's invoking!
+            // Does *not* store the value returned!
+            // This is the parent node's job; it might suppress this transition if it knows better.
         } finally {
             // Restore back to the state that called inline.
-            this.value = current;
+            this.here = current;
         }
     }
 

@@ -12,7 +12,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function Member(clazz, ...sgs) {
   if (!clazz[TargetGroups]) {
     clazz = class extends clazz {
-      /** Convenience method for the last group on the Member. */
+      /** Convenience method for the last group's class defined on the Member. */
       static get LastGroup() {
         return this[TargetGroups][this[TargetGroups].length - 1];
       }

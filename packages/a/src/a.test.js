@@ -19,53 +19,93 @@ beforeEach(() => {
 });
 
 test('log', () => {
-    let a = new A(()=>void(a.dd('Yes')));
+    let a = new A(()=>void(a.dd`Yes`));
+    // Passed through the anonymous method without a trap set -> display, pass through display because nothing registered -> undefined.
     expect(a.next().value).toEqual(undefined);
-    expect(a.logged).toEqual(['Yes']);
+    expect(a.describes).toEqual([]);
     expect(console.redirectedLogs).toEqual(['!Yes']);
 });
 test('log2deep', () => {
     let a = new A(()=>{
-        a.dd('One');
-        return a.nest(()=>()=>void(a.dd('Two')));
+        a.dd`One`;
+        return a.once(()=>()=>void(a.dd`Two`));
     });
+    expect(a.next().value.name).toEqual("");
+    // We haven't *run* the describe node yet, so we're still buffering output.
+    expect(a.describes).toEqual(['One']);
+    expect(console.redirectedLogs).toEqual([]);
     expect(a.next().value).toEqual(undefined);
-    expect(a.logged).toEqual(['One', 'Two']);
-    expect(console.redirectedLogs).toEqual([
-        expect.stringMatching(/\.Intermediate nonterminal state -- starting over from:.*/), '!One', '!Two'
-    ]);
+    expect(a.describes).toEqual([]);
+    expect(console.redirectedLogs).toEqual(['!One', '!Two']);
 });
 test('nocontinue', () => {
-    let a = new A(()=>void(a.dd('Yes')));
-    a.next();
+    let a = new A(()=>void(a.dd`Yes`));
+    expect(a.next().value).toEqual(undefined);
     expect(console.redirectedLogs).toEqual(['!Yes']);
+    expect(a.here).toEqual(undefined);
     expect(()=>a.next()).toThrow();
+    // a.next();
+    // expect(a.here).toEqual(undefined);
+    // expect(console.redirectedLogs).toEqual(['!Yes', '!Yes']);
+    // expect(a.here).toEqual(undefined);
+    // a.next();
+    // expect(a.here).toEqual(undefined);
+    // expect(console.redirectedLogs).toEqual(['!Yes', '!Yes', '!Yes']);
+    // // This test is broken. It *should* log once and then go to a select with no options, but it doesn't seem to...
+    // expect(false).toBeTruthy();
 });
 test('proffer', () => {
     let a = new A(() => {
-        a.sk('this?');
-        a.sk('that?');
+        a.sk`this?`();
+        a.sk`that?`();
     });
-    expect(a.next().value).toEqual(undefined);
+    expect(a.next().value).toEqual(a.select);
     expect(a.options).toEqual([['this?', undefined], ['that?', undefined]]);
     expect(console.redirectedLogs).toEqual(['?Option0this?', '?Option1that?', ]);
 });
+test('profferReuse', () => {
+    let a = new A(() => {
+        a.sk`this?`()
+            `that?`();
+    });
+    expect(a.next().value).toEqual(a.select);
+    expect(a.options).toEqual([['this?', undefined], ['that?', undefined]]);
+    expect(console.redirectedLogs).toEqual(['?Option0this?', '?Option1that?', ]);
+});
+
+test('profferBadReuse', () => {
+    let a = new A(() => {
+        a.sk`unterminated`  // Oops, forgot to list the consequences of this choice!
+            `terminated`();
+    });
+    expect(a.next().value).toEqual(a.select);
+    expect(a.options).toEqual([['unterminated', undefined], ['terminated', undefined]]);
+    expect(console.redirectedLogs).toEqual(['?Option0unterminated', '?Option1terminated', ]);
+});
 describe('select', () => {
-    const choices = ['Good', 'Bad']
+    const choices = ['Good', 'Okayish']
     function thisOrThat() {
         let a = this;
-        a.sk('this?', ()=>void(a.dd(choices[0])));
-        a.sk('that?', ()=>void(a.dd(choices[1])));
+        a.dd`Hello!`;
+        a.sk`this?`(()=>void(a.describe(choices[0])))
+            `that?`(()=>void(a.describe(choices[1])));
     }
-    test.each([[0], [1]])('%# %i', (opt) => {
+    test.each([0, 1])('%#', (opt) => {
         let a = new A(thisOrThat);
-        expect(a.next().value).toEqual(undefined);
-        expect(a.options.length).toBeGreaterThan(opt);
+        expect(a.next().value).toEqual(a.select);
+        expect(a.describes).toEqual([]);
+        expect(a.options.length).toEqual(2);
+        expect(a.options[0][0]).toEqual('this?');
+        expect(a.options[1][0]).toEqual('that?');
+        expect(console.redirectedLogs).toEqual(['!Hello!', '?Option0this?', '?Option1that?']);
 
         expect(a.next(opt).value).toEqual(undefined);
-        expect(a.logged).toEqual([choices[opt]]);
+        expect(a.describes).toEqual([]);
         expect(a.options).toEqual([]);
-        expect(console.redirectedLogs).toEqual(['?Option0this?', '?Option1that?', `!${choices[opt]}`]);
+
+        expect(console.redirectedLogs).toEqual(['!Hello!', '?Option0this?', '?Option1that?', `!${choices[opt]}`]);
+
+        expect(()=>a.next()).toThrow();
     });
 });
 // test('fallbackOnly', () => {
@@ -77,7 +117,7 @@ describe('select', () => {
 //         });
 //     });
 //     expect(a.next().value).toEqual(undefined);
-//     expect(a.logged).toEqual(['begin', 'end']);
+//     expect(a.describes).toEqual(['begin', 'end']);
 //     expect(a.options).toEqual([]);
 // });
 // describe('fallbackAway', () => {

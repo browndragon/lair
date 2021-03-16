@@ -1,64 +1,103 @@
 import {ContextCallable} from '@browndragon/callable';
 import {Machine} from '@browndragon/sm';
 import val from './val';
+import {isTagExpr} from '@browndragon/tag';
 
 /**
- * Root of the A graph.
+ * Root of the A graph. Note that states within the a graph never reach the undefined state: instead, when they *would* reach the undefined state, they go into the display state!
  */
 export default class A extends Machine {
     constructor(cb) {
         super(cb);
+        this.describes = [];
+        this.options = [];
     }
-    /** a.dd a remark. */
-    dd(...texts) {
-        this.logged.push(...texts.map(val).filter(Boolean));
-        return this;
-    }
-    /** a.sk a question (really, offer a single reply). */
-    sk(label, cb) {
-        // This was created under a specific nyway context.
-        // If there's a call to nyway within this same node (inlines nest a new scope but don't otherwise damage it),
-        // then we should take that same value.
-        // 
-        this.options.push([label, cb]);
-        return this;
-    }
-    /** a.nyway a point to continue from when evaluating options. */
-    // a.sk(...);
-    // a.sk(...);
-    // a.dd(...);  // Just logs as normal.
-    // a.nyway(...); // Okay! the above a.sks need to redirect to here during their inlines if their state is no bueno.
-    // a.sk(...);
-    nyway(cb) {
-        return this;
-    }
-    get nywayTop() { return this.nyways[this.nyways.length - 1] }
-    display() {
-        for (let i = 0; i < this.logged.length; ++i) {
-            console.log('!', this.logged[i]);
+
+    describe(s) { this.describes.push(s); return this; }
+    option(label, cb) { this.options.push([label, cb]); return this; }
+    finally(cb) { this.trap(cb); return this; }
+    redirect(cb) { this.jump(cb); return this; }
+
+    /** a.dd a description as a tagged template. */
+    dd(strings, ...params) { return this.describe(String.raw(strings, ...params)) }
+
+    /**
+     * a.sk (or really, offer) an option for later selection as a tagged template + following method invocation,
+     * like:
+     * ```
+     *   a.sk`Go east`(eastwards)  // Some function `eastwards` defined elsewhere
+     *       `Go west`(() => {
+     *         a.dd`The pungent stench of mildew emanates from the wet dungeon walls`;
+     *         a.sk`Go back east`(a.prev)  // can't do a.here, we're in a new node!
+     *         a.sk`Kick door`(() => {...})  // Nest arbitrarily.
+     *         // Special favor to you, A nodes reroute undefined to `display`.
+     *       })
+     *       `Wait here`(a.here);
+     * ```
+     */
+    get sk() {
+        let a = this;
+        return function consumeTag(strings, ...params) {
+            return function consumeData(cb, ...others) {
+                if (isTagExpr(cb, ...others)) {
+                    console.warn('Unterminated ask chain', strings, params, 'into', cb, others);
+                    a.option(String.raw(strings, ...params), undefined);
+                    // This means someone screwed up: you had an empty option which you forgot to close!
+                    return a.sk(cb, ...others);
+                }
+                a.option(String.raw(strings, ...params), cb);
+                return consumeTag;
+            }
         }
+    }
+
+    /** a.fter() sets a finally/trap. */
+    fter(cb) { this.finally(cb); return this }
+
+    /**
+     * Displays all logged content & all options. Override it for better support.
+     *
+     * Suitable for use as a node (since it will be invoked in the context of `this` -- even though it's actually really a method on `this`!). Always transitions into state `select`.
+     */
+    display() {
+        for (let i = 0; i < this.describes.length; ++i) {
+            console.log('!', this.describes[i]);
+        }
+        this.describes = [];
         for (let i = 0; i < this.options.length; ++i) {
             console.log('?', 'Option', i, this.options[i][0]);
         }
-    }
-    inline(next, ...params) {
-        return super.inline(next, ...params);
-    }
-    next(...params) {
-        if (this.value === undefined) {
-            let index = +params[0];
-            params = params.slice(1);
-            console.assert(Number.isFinite(index));
-            this.jump(this.options[index][1]);
+        if (this.options.length <= 0) {
+            // Since there are no options, the user can't select anything rational to proceed.
+            // Return undefined -- maybe there's a trap?
+            // This should halt execution, since there's now no safe way to proceed.
+            return undefined;
         }
-
-        this.logged = [];
+        // Otherwise, we're going to have to select an option which we displayed; the select state handles that.
+        return this.select;
+    }
+    /**
+     * Progresses to state [i] or repeats.
+     */
+    select(i) {
+        let option = this.options[+i];
+        if (!option) {
+            // Oops, do-over!
+            console.warn('Unrecognized option', i);
+            return this.here;
+        }
         this.options = [];
-        while(super.next(...params).value) {
-            console.log('.', 'Intermediate nonterminal state -- starting over from:', this.value);
+        return this.inline(option[1]);
+    }
+
+    _invoke(...params) {
+        let result = super._invoke(...params);
+        // This has already been checked for traps etc.
+        if (result === undefined && this.here !== this.display) {
+            // So: if they return undefined, we *should* halt, but we know that we need to pass through display so the human is prepared; do that now and let it control our next step.
+            return this.inline(this.display);
         }
-        this.display();
-        return this;
+        return result;
     }
 }
 

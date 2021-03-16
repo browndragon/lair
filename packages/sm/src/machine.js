@@ -1,7 +1,7 @@
 import Cursor from './cursor';
 
 /**
- * A Cursor with additional support for function identities.
+ * A Cursor with additional support for function identities and redirection.
  *
  * Since Machines cache references to their states (unlike the much looser cursor!), they're much heavier on memory. But what you get is the ability to gracefully handle otherwise-anonymous nested functions, as well as history tracking.
  */
@@ -35,12 +35,16 @@ export default class Machine extends Cursor {
     get prevIndex() {
         return this._invokes.length - (this._evaluatingNext ? 2 : 1);
     }
+    /** The last invoked (not `here`) node. */
     get prev() {
         return this._invokes[this.prevIndex];
     }
     /** The invoke history leading up to `prev`. */
     get prevs() { return this._invokes.slice(0, this.prevIndex + 1) }
 
+    /**
+     * Executes the current `here` and sets the next value.
+     */
     next(...params) {
         console.assert(!this._evaluatingNext);
         try {
@@ -61,9 +65,11 @@ export default class Machine extends Cursor {
     _invoke(...params) {
         // Record that we've entered this node (even if wrap does something else, it did it aiming at this node).
         let here = this.here;
-        if (!here) {
-            return undefined;
-        }
+        
+        console.assert(here);
+        // if (!here) {
+        //     return undefined;
+        // }
 
         this.invokeCount++;
         this._invokes.push(here);
@@ -79,19 +85,21 @@ export default class Machine extends Cursor {
         return nextState.traps.pop() || next;
     }
 
-    /** Jumps clear the trap state, since they effectively reset the state machine. */
+    /**
+     * As `Cursor.jump`, but additionally clears trap state.
+     * This is the primary way to clear trap state, so nodes call `jump` to recontextualize.
+     */
     jump(someNode) {
         if (this._evaluatingNext) {
             this._jumpTarget = someNode;
-            return someNode;
+            return this;
         }
-        for (let node of this._trapNodes) {
+        for (let node of this._trapNodes.values()) {
             let state = this.getState(node);
             state.traps = [];
         }
         this._trapNodes.clear();
-        super.jump(someNode);
-        return this;
+        return super.jump(someNode);
     }
 
     /** Exposes mutable state information associated with the current node. */
@@ -106,15 +114,6 @@ export default class Machine extends Cursor {
     // Convenience methods for working with state:
     /** User-specc'd onetime initialization. Only valid for this node, since it's internal. */
     once(cb) { return this.state.initOnce(cb) }
-    /**
-     * Does one-time initialization of module-object inner methods. Convenience wrapper.
-     *
-     * A 'nest' is the module-object of inner functions to a node. See tests for more examples.
-     *
-     * @param cb - A no arg function returning a module object, an object whose keys are nodes you might transition into (non-node keys lightly pollute the namespace but it's fine). If you've already called nest for this target (implicitly, `here`), then it will *not* execute cb again, but return the cached copy from last time.
-     * @param [target] - The node whose nest is being populated (implicitly, `here`).
-     */
-    nest(cb, target=this.here) { return this.getState(target).initNest(cb) }
 
     /**
      * Sets a trap so that any downstream (inline or retval) node which returns comeFrom (undefined by default) will once go to the goto state. All traps are cleared on jump.
@@ -130,18 +129,16 @@ export default class Machine extends Cursor {
 /** Stores per-node information. */
 class State {
     constructor() {
-        /** Number of visits */
+        /** Number of visits to this particular node */
         this.count = 0;
-        /** Machine's `nextCount` during last invoke */
-        this.lastNext = undefined;  // next counter during last visit.
-        /** Machine's `invokeCount` during last invoke */
-        this.lastInvoke = undefined;  // invoke counter during last visit.
+        /** Machine's `nextCount` during most recent invoke */
+        this.lastNext = undefined;
+        /** Machine's `invokeCount` during most recent invoke */
+        this.lastInvoke = undefined;
         /** Space for user-defined per-node data. */
         this.data = {};  // Scratch space for your node specific data.
-        /** Cache for per-node onetime data. */
-        this.once = undefined;  // User defined onetime initialization.
-        /** Cache for per-node nested functions. */
-        this.nest = undefined;  // Onetime initialized inner methods made static.
+        /** Cache for per-node onetime data, run once per machine. */
+        this.once = null;
 
         /**
          * If this is set, attempts to transition into this state will instead result in clearing the trap and entering the trap state. This is useful/meaningful for undefined or null, but it seems very weird for real states. Maybe sensible for testing or instrumenting or something.
@@ -149,15 +146,9 @@ class State {
         this.traps = [];
     }
     initOnce(cb) {
-        if (this.once === undefined && cb) {
+        if (this.once === null && cb) {
             this.once = cb();
         }
         return this.once;
-    }
-    initNest(cb) {
-        if (!this.nest && cb) {
-            this.nest = cb();
-        }
-        return this.nest;
     }
 }
