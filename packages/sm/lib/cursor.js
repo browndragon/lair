@@ -19,21 +19,22 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * Additionally, Cursors can be "reset" into any given node via the `jump` operator, which immediately sets their value into the given value. Note that this may cause them to revert done-ness!
  */
 class Cursor {
-  constructor(node) {
-    this.value = node;
+  constructor(here) {
     this._done = false;
     /**
      * Matches the signature of `value` -- if set, this is responsible for actually executing on each step!
      * It usually invokes `return this.here.apply(this, params)`, though potentially with some additional setup or teardown.
      */
 
-    this.wrap = undefined;
+    this.wrap = undefined; // Reset into the passed-in value.
+
+    this.here = here;
   }
   /** Note that a cursor with no next node is also considered done. */
 
 
   get done() {
-    return this._done || !this.value;
+    return this._done || !this.here;
   }
   /** Sets done. While value is undefined, done will still *read* as true. */
 
@@ -44,8 +45,8 @@ class Cursor {
   /** Convenience spelling for the "current value", which is the function the node machine thinks is being executed. */
 
 
-  get here() {
-    return this.value;
+  get value() {
+    return this.here;
   }
   /**
    * Resets next to the passed in value, usually called externally.
@@ -55,15 +56,15 @@ class Cursor {
    */
 
 
-  jump(value) {
-    this.value = value;
+  jump(here) {
+    this.here = here;
     return this;
   }
   /** Progresses the cursor to the next value. */
 
 
   next(...params) {
-    this.value = this._invoke(...params);
+    this.here = this._invoke(...params);
     return this;
   }
   /**
@@ -86,15 +87,15 @@ class Cursor {
       return undefined;
     }
 
-    let current = this.value;
+    let current = this.here;
 
     try {
-      this.value = next;
+      this.here = next;
       return this._invoke(...params); // Does *not* store the value returned!
       // This is the parent node's job; it might suppress this transition if it knows better.
     } finally {
       // Restore back to the state that called inline.
-      this.value = current;
+      this.here = current;
     }
   }
   /** Invokes the actual code under point. */

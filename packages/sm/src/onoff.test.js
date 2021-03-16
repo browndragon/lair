@@ -3,8 +3,8 @@ import Cursor from './cursor';  // '@browndragon/sm'; <-- this is a unit test so
 import Machine from './machine';
 
 export const States = {
-    on() { return States.off },
     off() { return States.on },
+    on() { return States.off },
 };
 
 test('OnOffCursor', () => {

@@ -9,8 +9,8 @@ A set of states is an object made of methods that expect to be called with `this
 // src/onoff.test.js#L5-L8
 
 export const States = {
-    on() { return States.off },
     off() { return States.on },
+    on() { return States.off },
 };
 ```
 
@@ -171,24 +171,23 @@ expect(machine.value).toEqual(Water.gas);
 
 Perhaps you instead need some sort of countdown latch behavior:
 ```js
-// src/sozu.test.js#L5-L20
+// src/sozu.test.js#L5-L19
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+const SozuState = {  // https://en.wikipedia.org/wiki/Shishi-odoshi
+    dumping() {
+        // This doesn't NEED to be implemented here, but it's a reasonable place to go.
+        this.capacity = 100;
+        this.fullness = 0;
+        return this.inline(SozuState.filling);
+    },
+    filling(amount=0) {
+        this.fullness += amount;
+        return this.fullness >= this.capacity ? this.inline(SozuState.dumping) : this.value;
+    },
+};
+let machine = new Cursor(SozuState.dumping);
+expect(machine.value).toEqual(SozuState.dumping);
+expect(machine.fullness).toEqual(undefined);
 ```
 This example causes the step which overfills the sozu to automatically transition into the `dumping` state (potentially with side effects), which resets the fullness variable and immediately transitions back into the filling state.
 
@@ -197,13 +196,16 @@ This example causes the step which overfills the sozu to automatically transitio
 ```
 import SM from '@browndragon/sm';
 
-const sm = new SM({
-    on(sm){ sm.transition('off') },
-    off(sm){ sm.transition('on') },
-}).reset('off');
-console.log(sm.current);  // 'off'
-sm.step();
-console.log(sm.current);  // 'on'
-sm.step();
-console.log(sm.current);  // 'off'
+const sm = new SM((() => {
+    const x = {
+        on(){ return x.off },
+        off(){ return x.on },
+    };
+    return x.off;
+})());
+console.log(sm.here);  // 'off'
+sm.next();
+console.log(sm.here);  // 'on'
+sm.next();
+console.log(sm.here);  // 'off'
 ```
