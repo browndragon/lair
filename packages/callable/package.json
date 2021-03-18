@@ -1,6 +1,6 @@
 {
   "name": "@browndragon/callable",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "description": "A base class for `functions` that are also `classes`",
   "keywords": [
     "function",
