@@ -33,6 +33,7 @@
     "build": "npm run build:embedme && npm run build:babel",
     "test": "jest",
     "test:debug": "node --inspect-brk node_modules/.bin/jest --runInBand",
+    "start:pool": "cd ./packages/pool/__tests__ && webpack-dev-server --config ../../../webpack/base.cjs --open",
     "start:sg": "cd ./packages/sg/__tests__ && webpack-dev-server --config ../../../webpack/base.cjs --open",
     "start:sm": "cd ./packages/sm/__tests__ && webpack-dev-server --config ../../../webpack/base.cjs --open",
     "lint": "lerna exec eslint src/**/*.js"
@@ -68,9 +69,9 @@
       "<rootDir>/node_modules/(?!(@browndragon/.*))"
     ]
   },
-  "dependencies": {
+  "peerDependencies": {
+    "@browndragon/a": "file:packages/a",
     "@browndragon/callable": "file:packages/callable",
-    "@browndragon/dia": "file:packages/dia",
     "@browndragon/destructure": "file:packages/destructure",
     "@browndragon/pool": "file:packages/pool",
     "@browndragon/sg": "file:packages/sg",

@@ -1,0 +1,36 @@
+{
+  "name": "@browndragon/store",
+  "version": "0.0.14",
+  "description": "Datastructures for storing (especially 2d) array information",
+  "author": "Brown Dragon <browndragon@googlegroups.com>",
+  "homepage": "https://github.com/browndragon/lair#readme",
+  "license": "MIT",
+  "main": "lib/index.js",
+  "module": "src/index.js",
+  "publishConfig": {
+    "access": "public"
+  },
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/browndragon/lair.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  },
+  "bugs": {
+    "url": "https://github.com/browndragon/lair/issues"
+  },
+  "peerDependencies": {
+    "phaser": "^3.52.0"
+  },
+  "devDependencies": {
+    "phaser": "^3.52.0"
+  }
+}
