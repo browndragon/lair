@@ -42,7 +42,6 @@ export default class Cursor {
         this.here = this._invoke(...params);
         return this;
     }
-
     /**
      * Combines a jump with a step for inlining of nodes.
      * You will *usually* want to call this like:
@@ -69,7 +68,6 @@ export default class Cursor {
             this.here = current;
         }
     }
-
     /** Invokes the actual code under point. */
     _invoke(...params) {
         // Run wrap if we've got it or else the popped node, returning its result.
