@@ -23,19 +23,31 @@
     "webpack": "^4.41.2",
     "webpack-cli": "^3.3.12",
     "webpack-dev-server": "^3.9.0",
-    "webpack-merge": "^4.2.2"
+    "webpack-merge": "^4.2.2",
+    "@browndragon/a": "file:packages/a",
+    "@browndragon/callable": "file:packages/callable",
+    "@browndragon/destructure": "file:packages/destructure",
+    "@browndragon/pool": "file:packages/pool",
+    "@browndragon/sg": "file:packages/sg",
+    "@browndragon/sm": "file:packages/sm",
+    "@browndragon/store": "file:packages/store",
+    "@browndragon/tag": "file:packages/tag",
+    "@browndragon/tsp": "file:packages/tsp",
+    "@browndragon/uv": "file:packages/uv"
   },
   "type": "module",
   "scripts": {
     "build:embedme": "lerna exec embedme README.md",
     "build:babel": "lerna exec --parallel -- babel --root-mode upward src -d lib --ignore **/*.spec.js,**/*.test.js",
     "build:sg": "cd ./packages/sg/__tests__ && webpack --config ../../../webpack/prod.cjs",
+    "build:tsp": "cd ./packages/tsp/__tests__ && webpack --config ../../../webpack/prod.cjs",
     "build": "npm run build:embedme && npm run build:babel",
     "test": "jest",
     "test:debug": "node --inspect-brk node_modules/.bin/jest --runInBand",
     "start:pool": "cd ./packages/pool/__tests__ && webpack-dev-server --config ../../../webpack/base.cjs --open",
     "start:sg": "cd ./packages/sg/__tests__ && webpack-dev-server --config ../../../webpack/base.cjs --open",
     "start:sm": "cd ./packages/sm/__tests__ && webpack-dev-server --config ../../../webpack/base.cjs --open",
+    "start:tsp": "cd ./packages/tsp/__tests__ && webpack-dev-server --config ../../../webpack/base.cjs --open",
     "lint": "lerna exec eslint src/**/*.js"
   },
   "jest": {
@@ -78,6 +90,7 @@
     "@browndragon/sm": "file:packages/sm",
     "@browndragon/store": "file:packages/store",
     "@browndragon/tag": "file:packages/tag",
+    "@browndragon/tsp": "file:packages/tsp",
     "@browndragon/uv": "file:packages/uv"
   }
 }

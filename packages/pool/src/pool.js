@@ -1,5 +1,5 @@
-import Phaser from 'phaser';
-import SG from '@browndragon/sg';
+//  import Phaser from 'phaser';
+import SG from '@browndragon/sg';  // Is this the right thing to do? Seems impossible to believe given :pointup:
 import UV from '@browndragon/uv';
 import {Matrix} from '@browndragon/store';
 

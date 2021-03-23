@@ -2,7 +2,7 @@ import { jest, test, expect } from '@jest/globals';
 import Matrix from './matrix';
 
 test('dataOperations', () => {
-    let s = new Matrix2d();
+    let s = new Matrix();
     for (let i = 0; i < 25; ++i) {
         expect(
             s.set(Math.floor(i / 5), i % 5, String.fromCharCode(65+i))
