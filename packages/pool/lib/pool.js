@@ -5,17 +5,18 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
-var _phaser = _interopRequireDefault(require("phaser"));
-
 var _sg = _interopRequireDefault(require("@browndragon/sg"));
+
+var _uv = _interopRequireDefault(require("@browndragon/uv"));
+
+var _store = require("@browndragon/store");
 
 var _conformers = _interopRequireDefault(require("./conformers"));
 
-var _sparse = _interopRequireDefault(require("./sparse"));
-
-var _tilemath = _interopRequireDefault(require("./tilemath"));
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+//  import Phaser from 'phaser';
+// Is this the right thing to do? Seems impossible to believe given :pointup:
 
 /** A Pool manages instances of its internal class similar to a tilemap(/layer); using setTileGeometry results in a grid offset, and setConformer allows specializing each `tile` value.
  * These have assumed locations! Like, if you modify x & y on these things, attempts to put/remove will use the location they had when they were first created.
@@ -23,12 +24,12 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 class Pool extends _sg.default.Group {
   constructor(...params) {
     super(...params);
-    this.tiledata = new _sparse.default();
+    this.tiledata = new _store.Matrix();
     this.setTileGeometry().setConformer(new.target.DefaultConformer);
   }
 
   setTileGeometry(tileWidth, tileHeight, offsetX, offsetY) {
-    this.tilemath = new _tilemath.default(tileWidth, tileHeight, offsetX, offsetY);
+    this.uv = new _uv.default(tileWidth, tileHeight, offsetX, offsetY);
     return this;
   }
 
@@ -63,7 +64,7 @@ class Pool extends _sg.default.Group {
   }
 
   prepareTileGameObject(u, v) {
-    const [x, y] = this.tilemath.xy(u, v); // Fetch-cached or create-new & undo any previous killandhide
+    const [x, y] = this.uv.xy(u, v); // Fetch-cached or create-new & undo any previous killandhide
 
     let go = this.get(x, y, this.defaultKey, this.defaultFrame);
     go.setActive(true).setVisible(true);
@@ -81,7 +82,7 @@ class Pool extends _sg.default.Group {
   }
 
   *getTilesWorld(x, y, w, h) {
-    const [uMin, vMin, uCount, vCount] = this.tilemath.uvBounds(x, y, w, h);
+    const [uMin, vMin, uCount, vCount] = this.uv.uvBounds(x, y, w, h);
 
     for (let v = 0; v < vCount; ++v) {
       for (let u = 0; u < uCount; ++u) {

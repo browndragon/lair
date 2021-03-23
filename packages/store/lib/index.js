@@ -3,10 +3,10 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-Object.defineProperty(exports, "Matrix2d", {
+Object.defineProperty(exports, "Matrix", {
   enumerable: true,
   get: function () {
-    return _matrix2d.default;
+    return _matrix.default;
   }
 });
 Object.defineProperty(exports, "Store", {
@@ -22,7 +22,7 @@ Object.defineProperty(exports, "Sparse", {
   }
 });
 
-var _matrix2d = _interopRequireDefault(require("./matrix2d"));
+var _matrix = _interopRequireDefault(require("./matrix"));
 
 var _store = _interopRequireDefault(require("./store"));
 

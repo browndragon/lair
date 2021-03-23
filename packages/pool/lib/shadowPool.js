@@ -5,23 +5,22 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
-var _phaser = _interopRequireDefault(require("phaser"));
-
 var _sg = _interopRequireDefault(require("@browndragon/sg"));
+
+var _store = require("@browndragon/store");
 
 var _pool = _interopRequireDefault(require("./pool"));
 
-var _sparse = _interopRequireDefault(require("./sparse"));
-
-var _tilemath = _interopRequireDefault(require("./tilemath"));
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+// import Phaser from 'phaser';
+// Is this the right thing to do? Seems impossible to believe given :pointup:
 
 /** A pool which watches some target group, ensuring that during our preupdate, their sprites deposit membership. */
 class ShadowPool extends _pool.default {
   constructor(...params) {
     super(...params);
-    this._shadowMap = new _sparse.default();
+    this._shadowMap = new _store.Matrix();
   }
 
   preUpdate(time, delta) {
@@ -29,16 +28,17 @@ class ShadowPool extends _pool.default {
 
     this._shadowMap.clear();
 
-    const watchGroup = this.constructor.WatchGroup.group(this.scene);
+    const watchGroup = this.constructor.WatchGroup.group(this.scene); // First, cast a shadow into the _shadowMap for each element that we need to watch.
 
     for (let member of watchGroup.getChildren()) {
       this.castShadows(member);
-    } // The _shadowMap now holds the proper wangIds for every tile, so set 'em:
+    } // And then reflect the (now synthesized) wangIds onto the tiles:
 
 
     for (let [[u, v], wangId] of this._shadowMap) {
       this.putTileUV(wangId, u, v);
-    } // And then go through the set of tiles and remove those which aren't in the shadow map:
+    } // And then go through the set of tiles and "remove" those which aren't in the shadow map.
+    // We actually set them to the undefined value and assume the conformer will remove them (perhaps with an animation?).
 
 
     for (let tile of this.getAllTiles()) {
@@ -53,8 +53,9 @@ class ShadowPool extends _pool.default {
   castShadows(member) {
     // Because we ensure that our shadow map resolution is at least 2x finer than our game object resolution, u/vCount should always be >2. If it isn't, then something can be both top & bottom (or left & right) under this math.
     let b = member.getBounds();
-    let [uMin, vMin, uCount, vCount] = this.tilemath.uvBounds(b.x, b.y, b.width, b.height);
-    uCount += 1;
+    let [uMin, vMin, uCount, vCount] = this.uv.uvBounds(b.x, b.y, b.width, b.height);
+    uCount += 1; // There's some off-by-one or something here? Weird.
+
     vCount += 1;
 
     for (let v = 0; v <= vCount; ++v) {
@@ -68,10 +69,17 @@ class ShadowPool extends _pool.default {
     }
   }
 
+  static get WatchGroup() {
+    if (!Object.getOwnPropertyDescriptor(this, '_WatchGroup')) {
+      this._WatchGroup = class extends _sg.default.Group {};
+    }
+
+    return this._WatchGroup;
+  }
+
 }
 
 exports.default = ShadowPool;
-ShadowPool.WatchGroup = class extends _sg.default.Group {};
 const kMiddle = 0b1111;
 const kTop = 0b0110;
 const kRight = 0b1100;

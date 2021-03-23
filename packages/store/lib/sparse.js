@@ -22,7 +22,8 @@ class Sparse extends _store.default {
   }
 
   get(...k) {
-    return this.data.get(this._key(k)).v;
+    let entry = this.data.get(this._key(k));
+    return entry && entry.v;
   }
 
   has(...k) {
