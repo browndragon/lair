@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import SG from '@browndragon/sg';
 
-import TestPool from './testPool';
+import Shadows from './shadows';
 
 export const game = new Phaser.Game({
     type: Phaser.WEBGL,
@@ -17,21 +17,20 @@ export const game = new Phaser.Game({
             });
         }
         create() {
-            this.add.existing(new TestPool(this));
             // Create a blob which tracks the mouse and then fades after mouseup.
             this.input.on('pointerdown', (pointer, ...params) => {
                 this.add.existing(new Pointer(this, pointer.x, pointer.y));
             });
             this.input.on('pointerup', (pointer, ...params) => {
                 // Just a pun for the Pointer group.
-                let group = TestPool.WatchGroup.group(this);
+                let group = Shadows.group(this);
                 for (let child of group.getChildren()) {
                     child.destroy();
                 }
             });
         }
         update(time, delta) {
-            let group = TestPool.WatchGroup.group(this);
+            let group = Shadows.group(this);
             for (let child of group.getChildren()) {
                 // Follow the cursor...
                 let offset = new Phaser.Math.Vector2(this.input.x - child.x, this.input.y - child.y);
@@ -44,7 +43,7 @@ export const game = new Phaser.Game({
     }],
 });
 
-class Pointer extends SG.Member(Phaser.GameObjects.Ellipse, TestPool.WatchGroup) {
+class Pointer extends SG.Member(Phaser.GameObjects.Ellipse, Shadows) {
     addedToScene() {
         super.addedToScene();
         this.scene.physics.add.existing(this);

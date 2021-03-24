@@ -1,9 +1,7 @@
-import Conformers from './conformers';
 import Pool from './pool';
-import ShadowPool from './shadowPool';
+import Watcher from './watcher';
 
 export {
-    Conformers,
     Pool,
-    ShadowPool,
+    Watcher,
 };
