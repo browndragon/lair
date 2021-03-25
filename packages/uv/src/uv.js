@@ -10,11 +10,12 @@ export default class UV {
         this.offsetY = offsetY;
     }
     /** Returns the 'x coordinate' in tile counts. */
-    u(x) { return Math.floor((x + this.offsetX) / this.width) }
+    u(x, cast=Math.floor) { return cast((x + this.offsetX) / this.width) }
     /** Returns the 'y coordinate' in tile counts. */
-    v(y) { return Math.floor((y + this.offsetY) / this.height) }
+    v(y, cast=Math.floor) { return cast((y + this.offsetY) / this.height) }
     /** Returns [u, v]  of (x, y) ("tile space") */
-    uv(x, y) { return [this.u(x), this.v(y)] }
+    uv(x, y, cast=Math.floor) { return [this.u(x, cast), this.v(y, cast)] }
+
     /** Returns the number of tiles containing 'width'. */
     uCount(width) { return Math.ceil(width / this.width) }
     /** Returns the number of tiles containing 'height'. */

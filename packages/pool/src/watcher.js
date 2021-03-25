@@ -53,17 +53,16 @@ export default function Watcher(clazz, PoolClazz) {
             }
         }
         castShadow(member) {
-            // Because we ensure that our shadow map resolution is at least 2x finer than our game object resolution, u/vCount should always be >2. If it isn't, then something can be both top & bottom (or left & right) under this math.
+            // Because we ensure that our shadow map resolution is at least 2x finer than our game object resolution, u/vCount should always be >2. If it isn't, then something can be both top & bottom (or left & right) under this math; that is always the 0 tile, which will probably look wrong.
             let b = member.getBounds();
-            let [uMin, vMin, uCount, vCount] = this._pool.uv.uvBounds(b.x, b.y, b.width, b.height);
-            uCount += 1;  // There's some off-by-one or something here? Weird.
-            vCount += 1;
-            for (let v = 0; v <= vCount; ++v) {
-                const rowPattern = v <= 0 ? kTop : v >= vCount ? kBottom : kMiddle;
-                for (let u = 0; u <= uCount; ++u) {
-                    const pattern = rowPattern & (u <= 0 ? kLeft : u >= uCount ? kRight : kMiddle);
+            let [uMin, vMin] = this._pool.uv.uv(b.x, b.y, Math.floor);
+            let [uMax, vMax] = this._pool.uv.uv(b.right, b.bottom, Math.ceil);
+            for (let v = vMin; v <= vMax; ++v) {
+                const rowPattern = v <= vMin ? kTop : v >= vMax ? kBottom : kMiddle;
+                for (let u = uMin; u <= uMax; ++u) {
+                    const pattern = rowPattern & (u <= uMin ? kLeft : u >= uMax ? kRight : kMiddle);
                     // Ensure this is (newly...) in the shadow map.
-                    this._shadowMap.bitwiseOr(uMin + u, vMin + v, pattern);
+                    this._shadowMap.bitwiseOr(u, v, pattern);
                 }
             }
         }
