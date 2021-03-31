@@ -1,6 +1,6 @@
 {
   "name": "@browndragon/cargo",
-  "version": "0.0.16",
+  "version": "0.0.17",
   "description": "phaser3 programmatic packfile support to package assets up into bundles",
   "keywords": [
     "phaser3",
@@ -29,4 +29,3 @@
     "url": "https://github.com/browndragon/lair/issues"
   }
 }
-

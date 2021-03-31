@@ -1,6 +1,6 @@
 {
   "name": "@browndragon/tag",
-  "version": "0.0.16",
+  "version": "0.0.17",
   "description": "Utilities for working with es6 tagged templates",
   "keywords": [
     "tag"
