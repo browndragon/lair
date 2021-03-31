@@ -51,14 +51,6 @@ const game = new Phaser.Game({...
             console.log(TestEntity.assetsOfType('spritesheet'));  // ['b', 'c']
             console.log(TestEntity.assetsOfType('animation'));  // ['b.ee', 'b.ss', 'b.ww', 'b.nn', 'bfirst.ee', ..., 'bfirst.nn', 'c.ee', ..., 'c.nn']
         }
-
-    assetTypes() {
-        return Object.keys(this.assets);
-    }
-    assetsOfType(assetType) {
-        // You have to interact with the phaser scene factories to actually *get* these objects ofc...
-        return Object.keys(this.assets[assetType]);
-    }
     }],
 });
 ```
