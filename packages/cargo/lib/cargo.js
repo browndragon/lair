@@ -5,10 +5,6 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
-var _filerows = _interopRequireDefault(require("./filerows"));
-
-var _frames = _interopRequireDefault(require("./frames"));
-
 var _asPackfile = _interopRequireDefault(require("./asPackfile"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -34,21 +30,25 @@ class Cargo {
   }
 
   asset(name) {
-    return `${this.name}.${good}`;
+    return `${this.name}.${name}`;
   }
-  /** Turns a module's worth of spritesheets into metadata-y animations. */
+  /**
+   * Turns a bunch of spritesheets with assumed-same row layout (so for instance: two rows named "right" and "left", or 4 rows named "ee"/"ss"/"ww"/"nn", etc; default 4 row) into the extracted animations.extracted
+   *
+   * Each key in animation descriptors names several output animations on this cargo as `${cargoName}.${key}.${rowName}`.
+   */
 
 
-  static animationRows(cargoName, descriptors) {
+  static animationRows(animationDescriptors, order = this.kOrder) {
     let rows = [];
 
-    for (let i = 0; i < kOrder.length; ++i) {
-      const dir = kOrder[i];
+    for (let i = 0; i < order.length; ++i) {
+      const dir = order[i];
 
-      for (let [k, v] of Object.entries(descriptors)) {
+      for (let [k, v] of Object.entries(animationDescriptors)) {
         let start = 0,
             length = 0,
-            key = `${cargoName}.${k}`,
+            key = k,
             imagekey = key;
 
         if (Number.isFinite(v)) {
@@ -59,11 +59,11 @@ class Cargo {
           let width = v.width;
           start = (v.start || 0) + width * i;
           length = v.length || width - v.start;
-          imagekey = v.key ? `${cargoName}.${v.key}` : key;
+          imagekey = v.key || key;
         }
 
         rows.push([`${key}.${dir}`, {
-          frames: (0, _frames.default)(imagekey, start, length)
+          frames: this.frames(imagekey, start, length)
         }]);
       }
     }
@@ -71,10 +71,13 @@ class Cargo {
     return Object.fromEntries(rows);
   }
 
-  static frames(key, start, length) {
+  static frames(key, start, length, isExact = false) {
     return Array.from({
       length
-    }).map((_, j) => ({
+    }).map(isExact ? (_, j) => ({
+      fkey: key,
+      frame: start + j
+    }) : (_, j) => ({
       key: key,
       frame: start + j
     }));

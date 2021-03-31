@@ -6,10 +6,10 @@ Object.defineProperty(exports, "__esModule", {
 Object.defineProperty(exports, "default", {
   enumerable: true,
   get: function () {
-    return _entity.default;
+    return _cargo.default;
   }
 });
 
-var _entity = _interopRequireDefault(require("./entity"));
+var _cargo = _interopRequireDefault(require("./cargo"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
