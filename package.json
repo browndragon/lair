@@ -26,6 +26,7 @@
     "webpack-merge": "^4.2.2",
     "@browndragon/a": "file:packages/a",
     "@browndragon/callable": "file:packages/callable",
+    "@browndragon/cargo": "file:packages/cargo",
     "@browndragon/destructure": "file:packages/destructure",
     "@browndragon/pool": "file:packages/pool",
     "@browndragon/sg": "file:packages/sg",
@@ -44,6 +45,7 @@
     "build": "npm run build:embedme && npm run build:babel",
     "test": "jest",
     "test:debug": "node --inspect-brk node_modules/.bin/jest --runInBand",
+    "start:cargo": "cd ./packages/cargo/__tests__ && webpack-dev-server --config ../../../webpack/base.cjs --open",
     "start:pool": "cd ./packages/pool/__tests__ && webpack-dev-server --config ../../../webpack/base.cjs --open",
     "start:sg": "cd ./packages/sg/__tests__ && webpack-dev-server --config ../../../webpack/base.cjs --open",
     "start:sm": "cd ./packages/sm/__tests__ && webpack-dev-server --config ../../../webpack/base.cjs --open",
@@ -84,6 +86,7 @@
   "peerDependencies": {
     "@browndragon/a": "file:packages/a",
     "@browndragon/callable": "file:packages/callable",
+    "@browndragon/cargo": "file:packages/cargo",
     "@browndragon/destructure": "file:packages/destructure",
     "@browndragon/pool": "file:packages/pool",
     "@browndragon/sg": "file:packages/sg",
