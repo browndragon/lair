@@ -1,7 +1,6 @@
 import Phaser from 'phaser';
 import TSP from '@browndragon/tsp';
 
-
 class UpdateAndTick extends Phaser.GameObjects.Text {
     constructor(scene, x, y, key, frame) {
         super(scene, x, y, new.target.mintName(key, frame));
@@ -28,7 +27,12 @@ class UpdateAndTick extends Phaser.GameObjects.Text {
     tick(delta) {
         this.x += delta;
     }
+    static sceneCreate(scene, someParam) {
+        console.log('creating in', scene, someParam)
+    }
 }
+TSP.preload((scene) => console.log('preloading in', scene));
+TSP.create(UpdateAndTick.sceneCreate, UpdateAndTick, 'with a param');
 
 class Base extends Phaser.Scene {
     static get myname() { throw 'undefined' }
@@ -42,7 +46,12 @@ class Base extends Phaser.Scene {
     constructor() {
         super(new.target.config);
     }
+    preload() {
+        TSP.preload.runAll(this);
+    }
     create() {
+        TSP.create.runAll(this);
+
         this.g = this.physics ? this.physics.add.group() : this.add.group();
         this.g.createMultiple({
             classType: UpdateAndTick,
