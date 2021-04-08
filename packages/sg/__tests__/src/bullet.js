@@ -2,9 +2,11 @@ import Phaser from 'phaser';
 import SG from '@browndragon/sg';
 
 import Mob from './mob';
+import Wall from './wall';
 
 export default class Bullet extends SG.Member(
-    Phaser.Physics.Arcade.Image, 
+    Phaser.Physics.Arcade.Image,
+    Wall,
     class extends SG.PGroup {
         constructor(...params) {
             super(...params);
@@ -42,6 +44,11 @@ export default class Bullet extends SG.Member(
         this.body.setCollideWorldBounds();
         this.body.onWorldBounds = true;
         this.setDepth(+1);
+    }
+    onWall(tile) {
+        this.destroy();
+        let layer = tile.layer.tilemapLayer;
+        layer.putTileAt(tile.index - 1, tile.x, tile.y);
     }
 }
 Bullet.preload = function(scene) {

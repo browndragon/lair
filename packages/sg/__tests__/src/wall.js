@@ -14,7 +14,7 @@ const HSMOL = 4;
 const NWINDOW = 2;
 const XWINDOW = 8;
 
-export default class Wall {
+export default class Wall extends SG.LGroup {
     static generate(scene) {
         let map = scene.add.tilemap(undefined,
             ts,ts,
@@ -29,9 +29,10 @@ export default class Wall {
         }
         let wallgid = floorgid;
         let walls = [];
+        let wallTilesets = [];
         for (let i = 0; i < 6; ++i) {
             walls.push(wallgid);
-            map.addTilesetImage(`wall${i}`, undefined, undefined, undefined, undefined, undefined, wallgid++);
+            wallTilesets.push(map.addTilesetImage(`wall${i}`, undefined, undefined, undefined, undefined, undefined, wallgid++));
         }
         let layer = map.createBlankLayer('layer', map.tilesets);
         layer.setDepth(-1);
@@ -41,27 +42,39 @@ export default class Wall {
         makeLabyrinth(map, 0, 0, map.width, map.height, floors, walls);
         // Bound the whole arena.
         outlineRect(map, 0, 0, map.width, map.height, walls);
-        // Internal recalculate etc.
-        // This *must* be last, because if you do it earlier apparently recalculateTiles doesn't work, and so the actual tiledefs don't match.
-        map.setCollision(walls);
-        // Tell people to bounce off of walls.
-        scene.physics.add.collider(
-            // No actions, just bounce, it's fine.
-            Mob.LastGroup.group(scene),
-            layer,  // NOT map.getLayer(), which is a layerdata.
-        );
-        // Tell bullets to die on walls & degrade the wall.
-        scene.physics.add.collider(
-            // To avoid confusion, the layer needs to be the second element -- because internal collision logic reorders collisions to ensure that.
-            Bullet.LastGroup.group(scene),
-            layer,
-            (bullet, tile) => {
-                bullet.destroy();
-                let layer = tile.layer.tilemapLayer;
-                layer.putTileAt(tile.index - 1, tile.x, tile.y);
-            }
-        );
+
+        for (let wallTileset of wallTilesets) {
+            this.setCollisionsOnTileLayer(layer, wallTileset);
+        }
+        // // Internal recalculate etc.
+        // // This *must* be last, because if you do it earlier apparently recalculateTiles doesn't work, and so the actual tiledefs don't match.
+        // map.setCollision(walls);
+        // // Tell people to bounce off of walls.
+        // scene.physics.add.collider(
+        //     // No actions, just bounce, it's fine.
+        //     Mob.LastGroup.group(scene),
+        //     layer,  // NOT map.getLayer(), which is a layerdata.
+        // );
+        // // Tell bullets to die on walls & degrade the wall.
+        // scene.physics.add.collider(
+        //     // To avoid confusion, the layer needs to be the second element -- because internal collision logic reorders collisions to ensure that.
+        //     Bullet.LastGroup.group(scene),
+        //     layer,
+        //     (bullet, tile) => {
+        //         bullet.destroy();
+        //         let layer = tile.layer.tilemapLayer;
+        //         layer.putTileAt(tile.index - 1, tile.x, tile.y);
+        //     }
+        // );
         return map;
+    }
+
+    static collider(sprite, tile) {
+        // Double dispatch! People just bounce, but bullets degrade.
+        // This is convenient, but does require that you subclass sprite (not *just* stick it into well known groups).
+        // That's not required! You could put a switch table using some type string here, or maintain Sets of sprites or
+        // something! But this happens not to, since it's much easier to write and I *do* control my sprite subclasses.
+        return sprite.onWall(tile);
     }
 }
 

@@ -2,9 +2,11 @@ import Phaser from 'phaser';
 import SG from '@browndragon/sg';
 
 import Bullet from './bullet';
+import Wall from './wall';
 
 export default class Mob extends SG.Member(
     Phaser.Physics.Arcade.Sprite,
+    Wall,
     class extends SG.PGroup {
         static get colliders() { return [this] }
         static collider(a, b) {
@@ -21,6 +23,7 @@ export default class Mob extends SG.Member(
         this.bulletdamage = 1;
         this.touchdamage = .25;
     }
+    onWall(tile) {}
     getHurt(damage) {
         if (this.hurting) {
             return false;
