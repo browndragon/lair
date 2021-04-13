@@ -10,6 +10,7 @@ export default class Player extends SG.Member(Mob, Coin.Collides, Gate.Collides)
         super(scene, x, y, 'player');
 
         this.keys = scene.input.keyboard.createCursorKeys();
+        console.log('Created player', this);
     }
     spawnBullet() {
         super.spawnBullet();

@@ -14,26 +14,44 @@ const HSMOL = 4;
 const NWINDOW = 2;
 const XWINDOW = 8;
 
-export default class Wall extends SG.LGroup {
+function collideOnly(sprite, tile) {
+}
+
+// Badly named; this is really all sorts of tile info.
+export default class Wall extends SG.Collider {
+    constructor(...params) {
+        super(...params);
+    }
+    static handler(gid, tileset) {
+        // Invoked explicitly by our tile colliding groups to keep the logic self contained.
+        if (/wall.*/.test(tileset.name)) { return collideOnly }
+        return undefined;
+    }
     static generate(scene) {
         let map = scene.add.tilemap(undefined,
             ts,ts,
             Math.floor(scene.cameras.main.width / ts),
             Math.floor(scene.cameras.main.height / ts)
         );
+
+        // This is really part of some "floor" lgroup, but we know nobody collides with it.
         let floorgid = 0;
         let floors = [];
         for (let i = 0; i < 5; ++i) {
             floors.push(floorgid);
             map.addTilesetImage(`floor${i}`, undefined, undefined, undefined, undefined, undefined, floorgid++);
         }
+
+        // Now! Real local walls!
         let wallgid = floorgid;
         let walls = [];
         let wallTilesets = [];
+
         for (let i = 0; i < 6; ++i) {
             walls.push(wallgid);
             wallTilesets.push(map.addTilesetImage(`wall${i}`, undefined, undefined, undefined, undefined, undefined, wallgid++));
         }
+
         let layer = map.createBlankLayer('layer', map.tilesets);
         layer.setDepth(-1);
         // Cover the arena.
@@ -43,12 +61,15 @@ export default class Wall extends SG.LGroup {
         // Bound the whole arena.
         outlineRect(map, 0, 0, map.width, map.height, walls);
 
-        for (let wallTileset of wallTilesets) {
-            this.setCollisionsOnTileLayer(layer, wallTileset);
-        }
-        // // Internal recalculate etc.
-        // // This *must* be last, because if you do it earlier apparently recalculateTiles doesn't work, and so the actual tiledefs don't match.
+        Mob.LastGroup.layer(layer);
+        Bullet.LastGroup.layer(layer);
+
+        // Collide all walltiles against the things they're supposed to collide against. This accepts multiple tilesets for the same piece of collision logic.
+        // this.initLayer(layer, true);
+        // Internal recalculate etc.
+        // This *must* be last, because if you do it earlier apparently recalculateTiles doesn't work, and so the actual tiledefs don't match.
         // map.setCollision(walls);
+
         // // Tell people to bounce off of walls.
         // scene.physics.add.collider(
         //     // No actions, just bounce, it's fine.
@@ -67,14 +88,6 @@ export default class Wall extends SG.LGroup {
         //     }
         // );
         return map;
-    }
-
-    static collider(sprite, tile) {
-        // Double dispatch! People just bounce, but bullets degrade.
-        // This is convenient, but does require that you subclass sprite (not *just* stick it into well known groups).
-        // That's not required! You could put a switch table using some type string here, or maintain Sets of sprites or
-        // something! But this happens not to, since it's much easier to write and I *do* control my sprite subclasses.
-        return sprite.onWall(tile);
     }
 }
 

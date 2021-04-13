@@ -24,6 +24,8 @@ export default class Scene extends Phaser.Scene {
         });
     }
     preload() {
+        // Apparently the base Phaser scene doesn't have a preload to delegate to? That's weird.
+        console.assert(!super.preload);
         TSP.preload(this);
     }
     create() {
@@ -31,6 +33,7 @@ export default class Scene extends Phaser.Scene {
         console.assert(!super.create);
         TSP.create(this);
         this._createCursorKeys();
+        // /shrug.
         this._setBoundsToCamera();
     }
     _setBoundsToCamera() {

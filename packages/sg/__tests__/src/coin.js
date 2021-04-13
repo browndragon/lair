@@ -3,9 +3,9 @@ import SG from '@browndragon/sg';
 
 export default class Coin extends SG.Member(
     Phaser.Physics.Arcade.Image,
-    class extends SG.PGroup {
-        static get overlaps() { return [Coin.Collides] }
-        static overlap(coin, player) {
+    class extends SG.Overlap {
+        get intersects() { return [Coin.Collides] }
+        intersect(coin, player) {
             coin.collect();
             player.getCoin(coin.value);
         }
@@ -48,7 +48,7 @@ export default class Coin extends SG.Member(
         });
     }
 }
-Coin.Collides = class extends SG.PGroup {}
+Coin.Collides = class extends SG.Overlap {}
 Coin.preload = function(scene) {
     const tmpl = {pixelWidth: 2, pixelHeight: 2};
     scene.textures.generate('coin1', {...tmpl, data:`

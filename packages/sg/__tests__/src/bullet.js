@@ -7,16 +7,12 @@ import Wall from './wall';
 export default class Bullet extends SG.Member(
     Phaser.Physics.Arcade.Image,
     Wall,
-    class extends SG.PGroup {
+    class extends SG.Overlap {
         constructor(...params) {
             super(...params);
             this.scene.physics.world.on('worldbounds', bullet => {
-                if (!(bullet.gameObject instanceof Bullet)) {
-                    return;
-                }
-                if (!bullet.gameObject.scene) {
-                    return;
-                }
+                if (!(bullet.gameObject instanceof Bullet)) { return }
+                if (!bullet.gameObject.scene) { return }
                 bullet.gameObject.destroy();
             }, this);
         }
@@ -24,18 +20,27 @@ export default class Bullet extends SG.Member(
             this.scene.physics.world.off('worldbounds', undefined, this);
             super.destroy(...params);
         }
-        static get overlaps() { return [Mob.LastGroup] }
-        static overlap(bullet, target) {
+        get intersects() { return [Mob.LastGroup] }
+        intersect(bullet, target) {
             if (bullet.parent == target) {
                 return;
             }
             target.getHurt(bullet.parent.bulletdamage);
             bullet.destroy();
         }
+        tileHandler(gid, tileset) {
+            if (Wall.handler(gid, tileset)) { return this.onWall }
+            return undefined;
+        }
+        onWall(bullet, tile) {
+            bullet.destroy();
+            let layer = tile.layer.tilemapLayer;
+            layer.putTileAt(tile.index - 1, tile.x, tile.y);
+        }
     },
 ) {
-    constructor(parent, x, y) {
-        super(parent.scene, x, y, `bullet`);
+    constructor(scene, x, y, parent) {
+        super(scene, x, y, `bullet`);
         this.parent = parent;
     }
     addedToScene() {
@@ -44,11 +49,6 @@ export default class Bullet extends SG.Member(
         this.body.setCollideWorldBounds();
         this.body.onWorldBounds = true;
         this.setDepth(+1);
-    }
-    onWall(tile) {
-        this.destroy();
-        let layer = tile.layer.tilemapLayer;
-        layer.putTileAt(tile.index - 1, tile.x, tile.y);
     }
 }
 Bullet.preload = function(scene) {

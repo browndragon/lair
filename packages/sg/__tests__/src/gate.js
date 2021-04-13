@@ -3,9 +3,9 @@ import SG from '@browndragon/sg';
 
 export default class Gate extends SG.Member(
     Phaser.Physics.Arcade.Image,
-    class extends SG.PGroup {
-        static get overlaps() { return [Gate.Collides] }
-        static overlap(gate, player) {
+    class extends SG.Overlap {
+        get intersects() { return [Gate.Collides] }
+        intersect(gate, player) {
             gate.scene.touchGate();
         }
     },

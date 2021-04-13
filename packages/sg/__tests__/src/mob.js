@@ -7,14 +7,15 @@ import Wall from './wall';
 export default class Mob extends SG.Member(
     Phaser.Physics.Arcade.Sprite,
     Wall,
-    class extends SG.PGroup {
-        static get colliders() { return [this] }
-        static collider(a, b) {
+    class extends SG.Collider {
+        get intersects() { return [this] }
+        intersect(a, b) {
             let ahurt = a.hurting;
             let bhurt = b.hurting;
             if (!bhurt) { a.getHurt(b.touchdamage); }
             if (!ahurt) { b.getHurt(a.touchdamage); }
         }
+        tileHandler(gid, tileset) { return Wall.handler(gid, tileset) }
     },
 ) {
     constructor(...params) {
@@ -23,7 +24,6 @@ export default class Mob extends SG.Member(
         this.bulletdamage = 1;
         this.touchdamage = .25;
     }
-    onWall(tile) {}
     getHurt(damage) {
         if (this.hurting) {
             return false;
@@ -47,7 +47,7 @@ export default class Mob extends SG.Member(
         this.clearTint();
     }
     spawnBullet() {
-        let bullet = new Bullet(this, this.x, this.y, this);
+        let bullet = new Bullet(this.scene, this.x, this.y, this);
         this.scene.add.existing(bullet);
         bullet.body.velocity.setToPolar(this.rotation, 200);
     }

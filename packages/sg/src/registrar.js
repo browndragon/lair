@@ -6,25 +6,26 @@ export default function Registrar(clazz) {
     return class extends clazz {
         /** Returns the group this class describes, installing it if necessary via `install()`. */
         static group(scene) {
-            return this.peek(scene) || this.install(scene);
+            return this.peek(scene) || ((new this(scene)).install());
         }
         /** Returns the group this class describes IFF it's already been created; else undefined. */
         static peek(scene) {
-            return registry(scene).get(this)
+            return registry(scene).get(this.sgRegistryKey)
         }
+        static get sgRegistryKey() { return this }
         /** Creates and installs this club's group, whether or not it's been installed before. */
-        static install(scene) {
-            let group = new this(scene);
-            registry(scene).set(this, group);
-            scene.add.existing(group);
-            return group;
+        install() {
+            const scene = this.scene;
+            registry(scene).set(this.constructor.sgRegistryKey, this);
+            scene.add.existing(this);
+            return this;
         }
 
         destroy(...params) {
             if (this.scene) {
                 let reg = registry(this.scene);
                 if (reg) {
-                    reg.delete(this.constructor)
+                    reg.delete(this.constructor.sgRegistryKey)
                 }
             }
             super.destroy(...params);
