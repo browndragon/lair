@@ -13,7 +13,7 @@ export default class Intersector extends PGroup {
     /** Override to return an `intersect(sprite, tile)` method which is invoked when a member of this group collides with a layer configured with `layer`. */
     tileHandler(gid, tileset) { return undefined }
 
-    /** Applies this intersector against the layer. Call, but probably don't override. */
+    /** Applies this intersector against the layer. You must explicitly call this on your layers, but probably don't override. */
     static layer(layer) {
         return this.group(layer.scene).layer(layer);
     }
@@ -40,6 +40,7 @@ export default class Intersector extends PGroup {
             if (!handler) { return }
             handler.call(this, sprite, tile);
         });
+        return layer;
     }
 
     install() {

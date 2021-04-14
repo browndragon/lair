@@ -8,6 +8,7 @@ export default class MapScene extends Scene {
         super({...params});
         console.assert(mapJSON);
         this.mapJSON = mapJSON;
+        this.boundGetEntity = this.getEntity.bind(this);
         // At end of create, your maps will be available in `this.mapObj`.
     }
 
@@ -22,6 +23,12 @@ export default class MapScene extends Scene {
         return undefined;
     }
 
+    // Returns a class type identified by name.
+    getEntity(type) {
+        throw 'unimplemented';
+    }
+
+
     preload() {
         super.preload();
         for (let [name, json] of Object.entries(this.mapJSON)) {
@@ -32,7 +39,7 @@ export default class MapScene extends Scene {
     create() {
         super.create();
         this.mapObj = {};
-        for (let name of Object.entries(this.mapJSON)) {
+        for (let name of Object.keys(this.mapJSON)) {
             this.mapObj[name] = this.addTilemapTiled(name);
         }
     }
@@ -42,6 +49,7 @@ export default class MapScene extends Scene {
         // Upgrade json by "loading" external tilesets.
         // These are treated like any other aspect of the entity they represent:
         // they must be JSON loaded (, if needed) in the preload hook of the object, because they're NOT supported here!
+        // This is totally acceptable if we think of them similar to how we think of our extended player class: built into the game, not a standalone asset like an art asset. Especially for a large number of repetitive similar chunks ("oh, another 32x32 wang 2-corner tileset"), this is efficient.
         this.expandTilesetJSON(json, mapName);
 
         // Create a tilemap (coincidentally using the above edited cached data).
@@ -63,6 +71,9 @@ export default class MapScene extends Scene {
             if (tileset.tilecount == undefined) {
                 const tilesetJSON = this.getTilesetJSON(tileset.source, mapName);
                 Object.assign(tileset, tilesetJSON);
+                // If we leave the 'source', phaser's loader will get annoyed at us.
+                tileset.wasSource = tileset.source;
+                delete tileset.source;
             }
         }
     }
@@ -71,19 +82,23 @@ export default class MapScene extends Scene {
     // they separate layers by type, losing ordering info, which screws up the display list.
     // Now, that will likely screw itself up (YOU NEED Z INDEXING) but we might as well be kind.
     loadLayers(tilemap, json) {
-        const getEntity = this.getEntity.bind(this);
         for (let {name, type} of json.layers) {
             switch (type) {
-                case 'tilelayer':
-                // Could also createLayerFromTileLayer.
-                Tilemaps.createObjectsFromTileLayer(tilemap, name, getEntity);
-                break;
-                case 'objectgroup':
-                Tilemaps.createObjectsFromLayer(tilemap, name, getEntity);
-                break;
-                case 'imagelayer':
-                Tilemaps.createImageLayer(tilemap, name, getEntity);
+                case 'tilelayer': this.createTilelayer(name, tilemap); break;
+                case 'objectgroup': this.createObjectgroup(name, tilemap); break;
+                case 'imagelayer': this.createImagelayer(name, tilemap); break;
+                default: throw 'unimplemented';
             }
         }
+    }
+    createTilelayer(name, tilemap) {
+        // Tilemaps.createObjectsFromTileLayer(tilemap, name, getEntity);
+        return Tilemaps.createTileLayerFromTileLayer(tilemap, name);
+    }
+    createObjectgroup(name, tilemap) {
+        return Tilemaps.createObjectsFromLayer(tilemap, name, this.boundGetEntity);
+    }
+    createImageLayer(name, tilemap) {
+        return Tilemaps.createImageLayer(tilemap, name);
     }
 }

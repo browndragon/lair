@@ -45,6 +45,7 @@
     "build": "npm run build:embedme && npm run build:babel",
     "test": "jest",
     "test:debug": "node --inspect-brk node_modules/.bin/jest --runInBand",
+    "start:arcade": "cd ./packages/arcade/__tests__ && webpack-dev-server --config ../../../webpack/base.cjs --open",
     "start:pool": "cd ./packages/pool/__tests__ && webpack-dev-server --config ../../../webpack/base.cjs --open",
     "start:sg": "cd ./packages/sg/__tests__ && webpack-dev-server --config ../../../webpack/base.cjs --open",
     "start:sm": "cd ./packages/sm/__tests__ && webpack-dev-server --config ../../../webpack/base.cjs --open",
