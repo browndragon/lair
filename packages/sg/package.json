@@ -1,6 +1,6 @@
 {
   "name": "@browndragon/sg",
-  "version": "0.0.20",
+  "version": "0.0.21",
   "description": "More formal support for phaser3 groups and subclassed game objects",
   "keywords": [
     "phaser3"

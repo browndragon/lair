@@ -1,6 +1,6 @@
 {
   "name": "@browndragon/a",
-  "version": "0.0.20",
+  "version": "0.0.21",
   "description": "A programmatic script & dialog manager (primarily for phaser).",
   "keywords": [
     "statemachine"
