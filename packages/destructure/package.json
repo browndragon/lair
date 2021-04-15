@@ -1,6 +1,6 @@
 {
   "name": "@browndragon/destructure",
-  "version": "0.0.21",
+  "version": "0.0.22",
   "description": "Augments es6 array destructuring to fake \"right hand\" destructuring, too.",
   "keywords": [
     "destructure",
