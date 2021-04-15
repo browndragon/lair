@@ -7,6 +7,8 @@ exports.default = void 0;
 
 var _pGroup = _interopRequireDefault(require("./pGroup"));
 
+var _groups = _interopRequireDefault(require("./groups"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /** Abstract base class for intersecting singleton groups. See Collider or Overlap for concrete subclasses. */
@@ -21,53 +23,68 @@ class Intersector extends _pGroup.default {
 
   get intersects() {
     return undefined;
+  } // Methods for intersecting with tilemaps. These are entered by calling
+  // `SG.tilemap(tilemap, Some, Set, Of, SG, Intersectors)`
+  // which will examine each of the trailing arguments for relevance across the tilesets and layers of the tilemap and set up
+  // colliders against those intersector's `intersect` method and relevant tiles.
+
+  /** Return true to intersect with the given layer; false to skip. */
+
+
+  wantsLayer(layer) {
+    return true;
   }
-  /** Override to return an `intersect(sprite, tile)` method which is invoked when a member of this group collides with a layer configured with `layer`. */
+  /**
+   * Return an array to intersect with those gids, `true` to intersect with all gids in the tileset; falsy for none.
+   * Note that wantsLayer true means that you'll *technically* collide with additional tiles, which will be suppressed for you.
+   * By default, this walks over the tileset and calls `wantsTile` on each member.
+   */
 
 
-  tileHandler(gid, tileset) {
-    return undefined;
-  }
-  /** Applies this intersector against the layer. You must explicitly call this on your layers, but probably don't override. */
+  wantsTilesOfTileset(tileset) {
+    let wantedTiles = [];
 
+    for (let i = 0; i < tileset.total; ++i) {
+      const gid = tileset.firstgid + i;
 
-  static layer(layer) {
-    return this.group(layer.scene).layer(layer);
-  }
-
-  layer(layer) {
-    let handlersByGid = {};
-    let collisions = [];
-
-    for (let tileset of layer.tileset) {
-      for (let i = 0; i < tileset.total; ++i) {
-        const gid = tileset.firstgid + i;
-        const handler = this.tileHandler(gid, tileset);
-
-        if (!handler) {
-          continue;
-        }
-
-        collisions.push(gid); // layer.setCollision(gid);  // , true, false, true);
-
-        handlersByGid[gid] = handler;
+      if (this.wantsTile(gid, tileset)) {
+        wantedTiles.push(gid);
       }
-    } // Ensures that all necessary additional faces collide.
+    }
+
+    return wantedTiles;
+  }
+  /** Return true to want a specific tile. By default returns true for any tile with a wantsTileType (via typeFromTile). */
 
 
-    layer.setCollision(collisions); // Then actually *use* this information. It's possible that someone else had already arranged these tiles to collide. W/e.
+  wantsTile(gid, tileset) {
+    return this.wantsTileType(this.typeFromTile(gid, tileset));
+  }
+  /** Return true to want any tile with a specific type. By default returns true for any defined type. */
 
-    this.physicsAddIntersector(layer, (sprite, tile) => {
-      const handler = handlersByGid[tile.index];
 
-      if (!handler) {
-        return;
+  wantsTileType(type) {
+    return true;
+  }
+  /** Convenience accessor for `type` of a specific tile, which can otherwise be buried kind of deep. */
+
+
+  typeFromTile(gid, tileset, defaultType = tileset.name) {
+    for (let obj of [tileset.getTileProperties(gid), tileset.getTileData(gid)]) {
+      if (!obj) {
+        continue;
       }
 
-      handler.call(this, sprite, tile);
-    });
-    return layer;
-  }
+      const type = obj.type;
+
+      if (type) {
+        return type;
+      }
+    }
+
+    return defaultType;
+  } // Override installation flow; don't call me directly (but instead use `MyIntersector.group(scene)`).
+
 
   install() {
     super.install();
@@ -75,23 +92,17 @@ class Intersector extends _pGroup.default {
 
     if (intersects) {
       console.assert(Array.isArray(intersects));
-      this.physicsAddIntersector(intersects.map(g => assertSafe(g.group(this.scene))));
+      this.physicsAddIntersector((0, _groups.default)(this.scene, ...intersects));
     }
 
     return this;
-  } // Overridden in direct subclasses to add to scene.
+  } // Overridden in direct subclasses to add to scene. Process can be overridden (for tiles).
 
 
-  physicsAddIntersector(targets, intersect = this.intersect) {
+  physicsAddIntersector(targets, process = this.intersect) {
     throw 'unimplemented';
   }
 
 }
 
 exports.default = Intersector;
-
-function assertSafe(g) {
-  console.assert( // Relies on someone else already importing Phaser for us. We can't do it here, because npm imports mean we'd get a different definition of Phaser than the invoker would!
-  g instanceof Phaser.Physics.Arcade.Group || g instanceof Phaser.Physics.Arcade.StaticGroup);
-  return g;
-}

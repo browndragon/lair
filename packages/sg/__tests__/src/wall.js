@@ -14,14 +14,8 @@ const HSMOL = 4;
 const NWINDOW = 2;
 const XWINDOW = 8;
 
-function collideOnly(sprite, tile) {
-}
-
 // Badly named; this is really all sorts of tile info.
-export default class Wall extends SG.Collider {
-    constructor(...params) {
-        super(...params);
-    }
+export default class Wall {
     static handler(gid, tileset) {
         // Invoked explicitly by our tile colliding groups to keep the logic self contained.
         if (/wall.*/.test(tileset.name)) { return collideOnly }
@@ -61,8 +55,7 @@ export default class Wall extends SG.Collider {
         // Bound the whole arena.
         outlineRect(map, 0, 0, map.width, map.height, walls);
 
-        Mob.LastGroup.layer(layer);
-        Bullet.LastGroup.layer(layer);
+        SG.tilemap(map, Bullet.LastGroup, Mob.LastGroup);
 
         // Collide all walltiles against the things they're supposed to collide against. This accepts multiple tilesets for the same piece of collision logic.
         // this.initLayer(layer, true);

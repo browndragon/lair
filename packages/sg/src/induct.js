@@ -1,5 +1,4 @@
 /** Adds the named gameObject to each of the variadic arg sgs. */
-
 export default function induct(gameObject, ...sgs) {
     console.assert(gameObject);
     const scene = gameObject.scene;

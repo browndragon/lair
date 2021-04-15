@@ -2,20 +2,23 @@ import Phaser from 'phaser';
 import SG from '@browndragon/sg';
 
 import Bullet from './bullet';
-import Wall from './wall';
 
 export default class Mob extends SG.Member(
     Phaser.Physics.Arcade.Sprite,
-    Wall,
     class extends SG.Collider {
         get intersects() { return [this] }
         intersect(a, b) {
+            if (b instanceof Phaser.Tilemaps.Tile) {
+                return
+            }
             let ahurt = a.hurting;
             let bhurt = b.hurting;
             if (!bhurt) { a.getHurt(b.touchdamage); }
             if (!ahurt) { b.getHurt(a.touchdamage); }
         }
-        tileHandler(gid, tileset) { return Wall.handler(gid, tileset) }
+        wantsTileType(type) {
+            return /wall.*/.test(type);
+        }
     },
 ) {
     constructor(...params) {

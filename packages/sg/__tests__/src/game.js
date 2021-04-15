@@ -56,7 +56,6 @@ export default class Game extends Phaser.Scene {
         );
         player.powerUp();
 
-        console.log('game subscribe', this);
         this.sys.registry.events.on('changedata-lives', this.lives, this);
         this.sys.registry.events.on('changedata-killed', this.killed, this);
 

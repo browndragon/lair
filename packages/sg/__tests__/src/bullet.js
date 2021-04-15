@@ -2,11 +2,9 @@ import Phaser from 'phaser';
 import SG from '@browndragon/sg';
 
 import Mob from './mob';
-import Wall from './wall';
 
 export default class Bullet extends SG.Member(
     Phaser.Physics.Arcade.Image,
-    Wall,
     class extends SG.Overlap {
         constructor(...params) {
             super(...params);
@@ -25,17 +23,24 @@ export default class Bullet extends SG.Member(
             if (bullet.parent == target) {
                 return;
             }
-            target.getHurt(bullet.parent.bulletdamage);
-            bullet.destroy();
+            if (target instanceof Phaser.Tilemaps.Tile) {
+                let layer = target.layer.tilemapLayer;
+                layer.putTileAt(target.index - 1, target.x, target.y);
+                bullet.destroy();
+                return;
+            }
+            if (target instanceof Mob) {
+                target.getHurt(bullet.parent.bulletdamage);
+                bullet.destroy();
+                return;
+            }
+            console.assert(false);
         }
-        tileHandler(gid, tileset) {
-            if (Wall.handler(gid, tileset)) { return this.onWall }
-            return undefined;
+        process(bullet, target) {
+            return true;
         }
-        onWall(bullet, tile) {
-            bullet.destroy();
-            let layer = tile.layer.tilemapLayer;
-            layer.putTileAt(tile.index - 1, tile.x, tile.y);
+        wantsTileType(type) {
+            return /wall.*/.test(type);
         }
     },
 ) {

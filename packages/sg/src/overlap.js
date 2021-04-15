@@ -14,12 +14,12 @@ export default class Collider extends Intersector {
      */
     get intersects() { return this.overlaps }
 
-    physicsAddIntersector(targets, intersect=this.intersect) {
+    physicsAddIntersector(targets, process=this.process) {
         this.scene.physics.add.overlap(
             this,
             targets,
-            intersect,
-            this.process,
+            this.intersect,
+            process,
             this,
         );
     }

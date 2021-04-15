@@ -14,12 +14,12 @@ export default class Collider extends Intersector {
      */
     get intersects() { return this.colliders }
 
-    physicsAddIntersector(targets, intersect=this.intersect) {
+    physicsAddIntersector(targets, process=this.process) {
         this.scene.physics.add.collider(
             this,
             targets,
-            intersect,
-            this.process,
+            this.intersect,
+            process,
             this,
         );
     }

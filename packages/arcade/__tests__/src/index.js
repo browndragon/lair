@@ -11,13 +11,13 @@ import quartergrey_json from './quartergrey.json';
 class Entity extends SG.Member(Phaser.Physics.Arcade.Image, class extends SG.Collider {
     get intersects() { return [this] }
     intersect(a, b) {}
-    tileHandler(gid, tileset) {
-        switch (Tilemaps.typeFromTileset(gid, tileset)) {
-            case 'grey': return this.onGrey;
-            default: throw 'unrecognized';
+    wantsType(type) {
+        switch (type) {
+            case 'grey': return true;
+            case undefined: return false;
+            default: throw 'unimplemented';
         }
     }
-    onGrey(sprite, tile) { }
 }) {
     constructor(scene, x, y) {
         super(scene, x, y, 'quartergrey', 0);
@@ -81,8 +81,10 @@ const game = new Phaser.Game({
         }
         // Creates the entities we encounter as game objects.
         getEntity(type) { return Entities[type] }
-        createTilelayer(name, tilemap) {
-            return Entity.LastGroup.layer(super.createTilelayer(name, tilemap));
+        createTilemap(name) {
+            let tilemap = super.createTilemap(name);
+            SG.tilemap(tilemap, Entity.LastGroup);
+            return tilemap;
         }
     }],
 });

@@ -40,11 +40,11 @@ export default class MapScene extends Scene {
         super.create();
         this.mapObj = {};
         for (let name of Object.keys(this.mapJSON)) {
-            this.mapObj[name] = this.addTilemapTiled(name);
+            this.mapObj[name] = this.createTilemap(name);
         }
     }
 
-    addTilemapTiled(mapName) {
+    createTilemap(mapName) {
         let json = this.cache.tilemap.entries.entries[mapName].data;
         // Upgrade json by "loading" external tilesets.
         // These are treated like any other aspect of the entity they represent:

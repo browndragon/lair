@@ -34,8 +34,8 @@ class Collider extends _intersector.default {
     return this.colliders;
   }
 
-  physicsAddIntersector(targets, intersect = this.intersect) {
-    this.scene.physics.add.collider(this, targets, intersect, this.process, this);
+  physicsAddIntersector(targets, process = this.process) {
+    this.scene.physics.add.collider(this, targets, this.intersect, process, this);
   }
 
 }
