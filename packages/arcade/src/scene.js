@@ -15,6 +15,7 @@ export default class Scene extends Phaser.Scene {
                 arcade: {
                     debug: true,
                     overlapBias: 8,
+                    tileBias: 8,
                     ...aParams,
                 },
                 ...pParams,
@@ -26,12 +27,12 @@ export default class Scene extends Phaser.Scene {
     preload() {
         // Apparently the base Phaser scene doesn't have a preload to delegate to? That's weird.
         console.assert(!super.preload);
-        TSP.preload(this);
+        TSP.preload.runAll(this);
     }
     create() {
         // Apparently the base Phaser scene doesn't have a create to delegate to? That's weird.
         console.assert(!super.create);
-        TSP.create(this);
+        TSP.create.runAll(this);
         this._createCursorKeys();
         // /shrug.
         this._setBoundsToCamera();

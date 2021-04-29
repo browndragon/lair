@@ -19,6 +19,8 @@ function tilemap(tm, ...iss) {
   let intersectorMap = new Map();
 
   for (let i of is) {
+    console.assert(!i.wantsTilesFromTileset); // No such method! You want "of" not "from".
+
     for (let ts of tm.tilesets) {
       let newTiles = i.wantsTilesOfTileset(ts);
 
