@@ -1,6 +1,6 @@
 {
   "name": "@browndragon/store",
-  "version": "0.0.22",
+  "version": "0.0.23",
   "description": "Datastructures for storing (especially 2d) array information",
   "author": "Brown Dragon <browndragon@googlegroups.com>",
   "homepage": "https://github.com/browndragon/lair#readme",
