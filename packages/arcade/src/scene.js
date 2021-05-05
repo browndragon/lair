@@ -35,7 +35,7 @@ export default class Scene extends Phaser.Scene {
         TSP.create.runAll(this);
         this._createCursorKeys();
         // /shrug.
-        this._setBoundsToCamera();
+        // this._setBoundsToCamera();
     }
     _setBoundsToCamera() {
         let main = this.cameras.main;

@@ -39,6 +39,7 @@ export default class Bullet extends SG.Member(
         process(bullet, target) {
             return true;
         }
+        wantsTilemap() { return true }
         wantsTileType(type) {
             return /wall.*/.test(type);
         }

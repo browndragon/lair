@@ -127,6 +127,23 @@ class MapScene extends _scene.default {
 
   createTilelayer(name, tilemap) {
     // Tilemaps.createObjectsFromTileLayer(tilemap, name, getEntity);
+    let layer = tilemap.getLayer(name);
+    console.assert(layer);
+
+    for (let property of layer.properties || []) {
+      switch (property.name) {
+        case 'object':
+          if (property.value) {
+            return Tilemaps.createObjectsFromTileLayer(tilemap, name, this.boundGetEntity);
+          }
+
+        // Fallthrough intentional.
+
+        default:
+          continue;
+      }
+    }
+
     return Tilemaps.createTileLayerFromTileLayer(tilemap, name);
   }
 

@@ -21,6 +21,10 @@ function tilemap(tm, ...iss) {
   for (let i of is) {
     console.assert(!i.wantsTilesFromTileset); // No such method! You want "of" not "from".
 
+    if (!i.wantsTilemap(tm)) {
+      continue;
+    }
+
     for (let ts of tm.tilesets) {
       let newTiles = i.wantsTilesOfTileset(ts);
 

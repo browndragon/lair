@@ -28,6 +28,12 @@ class Intersector extends _pGroup.default {
   // which will examine each of the trailing arguments for relevance across the tilesets and layers of the tilemap and set up
   // colliders against those intersector's `intersect` method and relevant tiles.
 
+  /** Return true to enable the rest of this code. False by default says never to interact with tilemap/tileset/tilelayer objects. */
+
+
+  wantsTilemap(tilemap) {
+    return false;
+  }
   /** Return true to intersect with the given layer; false to skip. */
 
 

@@ -9,7 +9,7 @@ var _intersector = _interopRequireDefault(require("./intersector"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-class Collider extends _intersector.default {
+class Overlap extends _intersector.default {
   /** Convenience override for intersect. */
   overlap(a, b) {}
   /** Convenience override for intersects. */
@@ -40,4 +40,4 @@ class Collider extends _intersector.default {
 
 }
 
-exports.default = Collider;
+exports.default = Overlap;

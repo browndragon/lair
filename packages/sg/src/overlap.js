@@ -1,6 +1,6 @@
 import Intersector from './intersector';
 
-export default class Collider extends Intersector {
+export default class Overlap extends Intersector {
     /** Convenience override for intersect. */
     overlap(a, b) { }
     /** Convenience override for intersects. */

@@ -16,6 +16,7 @@ export default class Mob extends SG.Member(
             if (!bhurt) { a.getHurt(b.touchdamage); }
             if (!ahurt) { b.getHurt(a.touchdamage); }
         }
+        wantsTilemap() { return true }
         wantsTileType(type) {
             return /wall.*/.test(type);
         }
