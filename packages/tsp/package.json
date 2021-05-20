@@ -1,6 +1,6 @@
 {
   "name": "@browndragon/tsp",
-  "version": "0.0.23",
+  "version": "0.0.24",
   "description": "Plugin for scenes and game objects which automatically support Time Steps for Physics",
   "author": "Brown Dragon <browndragon@googlegroups.com>",
   "homepage": "https://github.com/browndragon/lair#readme",
