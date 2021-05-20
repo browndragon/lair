@@ -11,7 +11,7 @@ exports.default = embody;
  * So: instead, override your addedToScene at the leaf to call bouncy(this).
  */
 function embody(object, {
-  bounce = 1,
+  bounce = 1 / 64,
   drag = 1024,
   mass = 1,
   useDamping = false

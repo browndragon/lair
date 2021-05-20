@@ -80,6 +80,18 @@ function facer(clazz, asSuffix = true) {
       return this[Q];
     }
 
+    facingOffset(length = this.width, relativeToThis = false) {
+      let vector = new Phaser.Math.Vector2();
+      vector.setToPolar(length, this.facingRotation);
+
+      if (relativeToThis) {
+        vector.x += this.x;
+        vector.y += this.y;
+      }
+
+      return vector;
+    }
+
   };
 }
 

@@ -45,6 +45,46 @@ class MapScene extends _scene.default {
     throw 'unimplemented';
   }
 
+  get EntityConfig() {
+    throw 'unimplemented';
+  } // Helper for EntityConfig.
+
+
+  getEntityConfigFromModule(module, prefix = undefined, array = []) {
+    if (!module) {
+      return array;
+    }
+
+    switch (typeof module) {
+      case 'object':
+        if (Array.isArray(module)) {
+          return;
+        }
+
+        if (prefix && prefix.length > 0) {
+          prefix = `${prefix}.`;
+        } else {
+          prefix = '';
+        }
+
+        for (let key in module) {
+          this.getEntityConfigFromModule(module[key], `${prefix}${key}`, array);
+        }
+
+        return array;
+
+      case 'function':
+        array.push({
+          type: prefix,
+          classType: module
+        });
+        return;
+
+      default:
+        return array;
+    }
+  }
+
   preload() {
     super.preload();
 
@@ -77,7 +117,8 @@ class MapScene extends _scene.default {
       type
     } of tilemap.tilesets) {
       tilemap.addTilesetImage(name, this.getTilesetImageKey(name, mapName));
-    }
+    } // Then, load the layers:
+
 
     this.loadLayers(tilemap, json);
     return tilemap;
@@ -86,10 +127,13 @@ class MapScene extends _scene.default {
 
   expandTilesetJSON(json, mapName) {
     console.assert(json && json.tilesets && json.tilesets.length);
+    let gids = [];
 
     for (let tileset of json.tilesets) {
       if (tileset.tilecount == undefined) {
         const tilesetJSON = this.getTilesetJSON(tileset.source, mapName);
+        console.assert(tilesetJSON);
+        console.assert(tilesetJSON.name);
         Object.assign(tileset, tilesetJSON); // If we leave the 'source', phaser's loader will get annoyed at us.
 
         tileset.wasSource = tileset.source;
@@ -102,6 +146,8 @@ class MapScene extends _scene.default {
 
 
   loadLayers(tilemap, json) {
+    const EntityConfig = this.EntityConfig;
+
     for (let {
       name,
       type
@@ -112,7 +158,13 @@ class MapScene extends _scene.default {
           break;
 
         case 'objectgroup':
-          this.createObjectgroup(name, tilemap);
+          // this.createObjectgroup(name, tilemap); break;
+          for (let object of tilemap.createFromObjects(name, EntityConfig, true)) {
+            // There doesn't seem to be anything else we need to do with these guys.
+            // Bugfix: They screw up displaySize because of an intermediate load-no-image; rectify.
+            object.setScale(1, 1);
+          }
+
           break;
 
         case 'imagelayer':

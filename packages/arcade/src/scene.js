@@ -1,5 +1,6 @@
 // import Phaser from 'phaser';
 import TSP from '@browndragon/tsp';
+import Cursors from './cursors';
 
 export default class Scene extends Phaser.Scene {
     constructor({
@@ -33,7 +34,7 @@ export default class Scene extends Phaser.Scene {
         // Apparently the base Phaser scene doesn't have a create to delegate to? That's weird.
         console.assert(!super.create);
         TSP.create.runAll(this);
-        this._createCursorKeys();
+        Cursors.installInto(this);
         // /shrug.
         // this._setBoundsToCamera();
     }
@@ -46,56 +47,4 @@ export default class Scene extends Phaser.Scene {
             true, true, true, true
         );
     }
-    get cursorKeys() {
-        return this[A];
-    }
-    _createCursorKeys() {
-        // When the player moves an arrow, move the earliest dough.
-        const KeyCodes = Phaser.Input.Keyboard.KeyCodes;
-        this[A] = this.input.keyboard.addKeys({
-            up: KeyCodes.UP,
-            down: KeyCodes.DOWN,
-            left: KeyCodes.LEFT,
-            right: KeyCodes.RIGHT,
-
-            space: KeyCodes.SPACE,
-            shift: KeyCodes.SHIFT,
-            esc: KeyCodes.ESC,
-            enter: KeyCodes.ENTER,
-            backspace: KeyCodes.BACKSPACE,
-            delete: KeyCodes.DELETE,
-
-            // Secondary navication -- comma & period are aka < & >; similar - & + imply adjustment.
-            comma: KeyCodes.COMMA,
-            lt: KeyCodes.COMMA,
-            period: KeyCodes.PERIOD,
-            gt: KeyCodes.PERIOD,
-            minus: KeyCodes.MINUS,
-            plus: KeyCodes.PLUS,
-        });
-        this[D] = new Map()
-            .set(this[A].left, Phaser.Math.Vector2.LEFT)
-            .set(this[A].right, Phaser.Math.Vector2.RIGHT)
-            .set(this[A].up, Phaser.Math.Vector2.UP)
-            .set(this[A].down, Phaser.Math.Vector2.DOWN);
-        return this[A];
-    }
-    updateCursorKeyVector(length=128, into, clearFirst=true) {
-        // Apply arrow key walking.
-        if (into == undefined) {
-            into = Phaser.Math.Vector2.ZERO.clone();
-        }
-        if (clearFirst) {
-            into.x = into.y = 0;   
-        }
-        for (let [key, vector] of this[D]) {
-            if (key.isDown && vector) {
-                into.add(vector);
-            }
-        }
-        into.setLength(length);
-        return into;
-    }
 }
-const D = Symbol('Directions');
-const A = Symbol('AllKeys');
